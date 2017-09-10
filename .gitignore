@@ -1,2 +1,8 @@
 # Compile files as .run
+
 *.run
+
+# From Cmake
+CMakeCache.txt
+cmake_install.cmake
+CMakeFiles/

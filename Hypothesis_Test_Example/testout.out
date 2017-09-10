@@ -1,0 +1,29 @@
+Using configuration: seed=3039360416372138484  
+
+- sinus function
+Falsifiable after 13 tests and 2 shrink 
+
+std::tuple<double>:   
+(49)
+
+/mnt/c/MM837_Computational_Physics/Hypothesis_Test_Example/tests.cc:7:
+RC_ASSERT(sinus_thr_nofac(x, 1e-12)>=-1.0) 
+
+Expands to:  
+-8727.34 >= -1   
+
+- sinus function no fac      
+Falsifiable after 13 tests and 2 shrink    
+
+std::tuple<double>:    
+(49)    
+
+/mnt/c/MM837_Computational_Physics/Hypothesis_Test_Example/tests.cc:12:   
+RC_ASSERT(sinus_thr_nofac(x, 1e-12)>=-1.0)     
+
+Expands to:  
+2140.48 <= 1    
+
+- sinus function nofac identity     
+OK, passed 100 tests   
+Some of your RapidCheck properties had failures. To reproduce these, run with:  RC_PARAMS="reproduce=CUxcp5WdzBiZ152Y0l2buBibvBiZhNG9h6jCyofLqQfo+ogM63iK0HqPKIj+toC9h6jCyofLqAIIA0ADAAAACEQAOMXauV3cgYWduNGdp9mb0HqPKIj+toC9h6jCyofLqQfo+ogM63iK0HqPKIj+toCggAQDMAAAAIQABA"    

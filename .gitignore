@@ -1,5 +1,7 @@
-# Compile files as .run
+# Compiled files
 *.run
+a.out
+*.exe
 
 # From Cmake
 CMakeCache.txt
@@ -13,3 +15,6 @@ files
 rapidcheck/
 output2.700000.txt
 output3.100000.txt
+
+# From running scripts
+*.dat

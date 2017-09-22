@@ -71,11 +71,11 @@ class Tent {
 		Tent() : r(0.0) {}
 
 	  double operator() (const double& x) const { 
-			return r*(1-2*fabs(x-0.5));
+			return r*(1.0-2.0*fabs(x-0.5));
 		}
 	  
 		double operator() (const double& x, const double& rin) const { 
-			return rin*(1-2*fabs(x-0.5));
+			return rin*(1.0-2.0*fabs(x-0.5));
 		}
 };
 
@@ -88,11 +88,11 @@ class Quartic {
 		Quartic() : r(0.0) {}
 
 	  double operator() (const double& x) const { 
-			return r*(1-(2*x-1)*(2*x-1)*(2*x-1)*(2*x-1));
+			return r*(1.0-(2.0*x-1.0)*(2.0*x-1.0)*(2.0*x-1.0)*(2.0*x-1.0));
 		}
 	  
 		double operator() (const double& x, const double& rin) const { 
-			return rin*(1-(2*x-1)*(2*x-1)*(2*x-1)*(2*x-1));
+			return rin*(1.0-(2.0*x-1.0)*(2.0*x-1.0)*(2.0*x-1.0)*(2.0*x-1.0));
 		}
 };
 

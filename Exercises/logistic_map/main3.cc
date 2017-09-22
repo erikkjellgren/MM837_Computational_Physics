@@ -52,13 +52,13 @@ int main() {
 	const int nmax=1e4;
 	double feigenbaum, x0, r0, k;
 	vector<double> kvec;
-	typedef Mouse mymap;
+	typedef LogisticMap mymap;
 
 	mymap lm;
 	
 	x0 = 0.5;
 	r0 = 3.5;
-	k = 1;
+	k = 2;
 	for (int i=0;i<3;i++){
 		k = k*2;
 		Fn<mymap> fn(lm,k); 
@@ -70,7 +70,7 @@ int main() {
 		vector<double> ans = nr(x0, r0, tol, nmax);  
 		kvec.push_back(ans[1]);
 		x0 = ans[0];
-		r0 = ans[1] + 0.01;
+		r0 = ans[1] + 0.001;
 	}
 	
 	

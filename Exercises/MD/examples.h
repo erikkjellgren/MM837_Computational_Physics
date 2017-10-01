@@ -10,6 +10,26 @@
 #include<cmath>
 #include<vector>
 
+class SimplePendulum { 
+
+	double m, L; 
+	const double g=9.8;
+
+	public: 
+		SimplePendulum( const double& m_in, const double& L_in) : 
+			m(m_in), L(L_in) {} 
+
+		int getNDof() const { 
+			return 1;
+		}
+
+		double operator() (int i, const std::vector<double>& q) const { 
+			return L*m*g*sin(q[0]); 
+		}
+
+};
+
+//----------------------------------------------------------------------------
 class SimpleHarmonicOscillator { 
 
 	double m, k; 

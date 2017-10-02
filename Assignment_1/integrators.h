@@ -1,14 +1,27 @@
 
+#include<vector>
 
-void NaiveEuler(double& position_x, double& velocity_x, double& acceleation_x, const double& integration_step){
-	// position_x, postion of the particle
-	// velocity_x, velocity of the particle
-	// acceleation_x, acceleration of the particle
-	// integration_step, stepsize taking in the integration
-	double x_new, v_new;
-	x_new = position_x + integration_step*velocity_x;
-	v_new = velocity_x + integration_step*acceleation_x;
-	
-	position_x = x_new;
-	velocity_x = v_new;
-}
+using namespace std;
+
+class integrators{
+	double integration_step, integration_step_half;
+	int number_particles;
+	public:
+		integrators(const double& integration_step_, const int& number_particles_){
+			integration_step = integration_step_;
+			integration_step_half = integration_step/2.0;
+			number_particles = number_particles_;
+		}
+		
+		void update_position(vector<double>& position_x, vector<double>& velocity_x){
+			for (int i=0; i<number_particles-1; i++){
+				position_x[i] += velocity_x[i]*integration_step;
+			}
+		}
+		
+		void update_velocity(vector<double>& velocity_x, vector<double>& acceleration_x){
+			for (int i=0; i<number_particles-1; i++){
+				velocity_x[i] += acceleration_x[i]*integration_step_half;
+			}
+		}
+};

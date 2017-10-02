@@ -15,16 +15,19 @@ class Forces{
 			mass_inverse = 1.0/mass_;
 		}
 		
-		void polynomicForce(vector<double>& position_x, vector<double>& acceleration_x){
-			int idx1, idx2;
+		void polynomicForce(const vector<double>& position_x, vector<double>& acceleration_x){
 			double Force;
+			for (int i=0; i<number_particles; i++){
+				acceleration_x[i] = 0.0;
+			}
+			
 			for (int i=0; i<number_particles-1; i++){
 				Force = 0.0;
 				if (a != 0.0){Force += a*(position_x[i] - position_x[i+1]);}
 				if (b != 0.0){Force += b*(position_x[i] - position_x[i+1])*(position_x[i] - position_x[i+1]);}
 				if (c != 0.0){Force += c*(position_x[i] - position_x[i+1])*(position_x[i] - position_x[i+1])*(position_x[i] - position_x[i+1]);}
-				acceleration_x[i]   += Force*mass_inverse;
-				acceleration_x[i+1] -= Force*mass_inverse;
+				acceleration_x[i]   -= Force*mass_inverse;
+				acceleration_x[i+1] += Force*mass_inverse;
 				}
 		}
 };

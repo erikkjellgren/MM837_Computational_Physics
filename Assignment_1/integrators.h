@@ -13,13 +13,13 @@ class integrators{
 			number_particles = number_particles_;
 		}
 		
-		void update_position(vector<double>& position_x, vector<double>& velocity_x){
+		void update_position(vector<double>& position_x, const vector<double>& velocity_x){
 			for (int i=0; i<number_particles-1; i++){
 				position_x[i] += velocity_x[i]*integration_step;
 			}
 		}
 		
-		void update_velocity(vector<double>& velocity_x, vector<double>& acceleration_x){
+		void update_velocity(vector<double>& velocity_x, const vector<double>& acceleration_x){
 			for (int i=0; i<number_particles-1; i++){
 				velocity_x[i] += acceleration_x[i]*integration_step_half;
 			}

@@ -28,6 +28,6 @@ class Forces{
 				if (c != 0.0){Force += c*(position_x[i] - position_x[i+1])*(position_x[i] - position_x[i+1])*(position_x[i] - position_x[i+1]);}
 				acceleration_x[i]   -= Force*mass_inverse;
 				acceleration_x[i+1] += Force*mass_inverse;
-				}
+			}
 		}
 };

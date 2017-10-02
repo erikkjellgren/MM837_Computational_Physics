@@ -18,3 +18,5 @@ output3.100000.txt
 
 # From running scripts
 *.dat
+*.txt
+*.out

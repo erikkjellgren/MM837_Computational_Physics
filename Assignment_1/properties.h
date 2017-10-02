@@ -3,13 +3,16 @@
 
 using namespace std;
 
-class print_results{
+class calc_properties{
 	int number_particles;
-	FILE * energyfile;
+	double a, b, c, mass;
 	public:
-		print_results(const int& number_particles_){
+		print_results(const int& number_particles_, const double& a_, const double& b_, const double& c_, const double mass_){
 			number_particles = number_particles_;
-			energyfile = fopen("energy.txt", "w");
+			a = a_;
+			b = b_;
+			c = c_;
+			mass = mass_;
 		}
 		
 		vector<double> getEnergy(const vector<double>& position_x, const vector<double>& velocity_x){
@@ -26,16 +29,5 @@ class print_results{
 			energy_vector.push_back(kintetic_energy);
 			energy_vector.push_back(potential_energy);
 			return energy_vector;
-		}
-		
-		void writeEnergy(const double& kinetic_energy, const double& potential_energy){
-			fprintf(energyfile, "%f", kintetic_energy);
-			fprintf(energyfile, " ");
-			fprintf(energyfile, "%f", potential_energy);
-			fprintf(energyfile, "\n");	
-		};
-		
-		void close_output_files(){
-			fclose(energyfile);
 		}
 };

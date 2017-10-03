@@ -1,13 +1,16 @@
 
 #include<mpi.h>
 #include<iostream>
+#include<fstream>
 #include<cmath>
 #include "integrators.h"
 #include "forces.h"
 #include "printresults.h"
 #include "properties.h"
+#include"json.hpp"
 
 using namespace std;
+using json = nlohmann::json;
 
 int main(){
 	// initialize the MPI
@@ -18,11 +21,13 @@ int main(){
 	MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 	
 	// initialize the output class
-	if (world_rank == 0){print_results results();} 
-	results.checkInput(world_size);
+	if (world_rank == 0){
+		print_results results();
+		results.checkInput(world_size);
+	} 
 	
 	// assign all variables
-	double mass, integration_step, delta, a, b, c, recv_buffer;
+	double mass, integration_step, delta, a, b, c, recv_buffer, total_kinetic_energy, total_potential_energy;
 	const double pi = 3.141592653589793238462643383279;
 	int number_particles_global, number_steps, number_particles_local, print_frequency;
 	vector<double> position_x, velocity_x, acceleration_x;
@@ -44,17 +49,16 @@ int main(){
 		// pretty ugly way to send it out. There must be
 		// a better solution. 
 		for (int i=1; i<world_size; i++){
-			MPI_Send(&a,1,MPI_DOUBLE,i,1,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-			MPI_Send(&b,1,MPI_DOUBLE,i,2,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-			MPI_Send(&c,1,MPI_DOUBLE,i,3,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-			MPI_Send(&mass,1,MPI_DOUBLE,i,4,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-			MPI_Send(&delta,1,MPI_DOUBLE,i,5,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-			MPI_Send(&number_particles_global,1,MPI_INT,i,6,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-			MPI_Send(&number_steps,1,MPI_INT,i,7,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-			MPI_Send(&print_frequency,1,MPI_INT,i,8,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+			MPI_Send(&a,1,MPI_DOUBLE,i,1,MPI_COMM_WORLD);
+			MPI_Send(&b,1,MPI_DOUBLE,i,2,MPI_COMM_WORLD);
+			MPI_Send(&c,1,MPI_DOUBLE,i,3,MPI_COMM_WORLD);
+			MPI_Send(&mass,1,MPI_DOUBLE,i,4,MPI_COMM_WORLD);
+			MPI_Send(&delta,1,MPI_DOUBLE,i,5,MPI_COMM_WORLD);
+			MPI_Send(&number_particles_global,1,MPI_INT,i,6,MPI_COMM_WORLD);
+			MPI_Send(&number_steps,1,MPI_INT,i,7,MPI_COMM_WORLD);
+			MPI_Send(&print_frequency,1,MPI_INT,i,8,MPI_COMM_WORLD);
 		}
 	}
-	// 
 	if (world_rank!=0){
 			MPI_Recv(&a,1,MPI_DOUBLE,0,1,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 			MPI_Recv(&b,1,MPI_DOUBLE,0,2,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
@@ -89,15 +93,15 @@ int main(){
 		runForces.polynomicForce(position_x, acceleration_x);
 		
 		// communicate that single force
-		if (world_rank+1 == world_size){MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, 0, 1,MPI_COMM_WORLD,MPI_STATUS_IGNORE);}
-		else{MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, world_rank+1, 1,MPI_COMM_WORLD,MPI_STATUS_IGNORE);}
+		if (world_rank+1 == world_size){MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);}
+		else{MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, world_rank+1, 1, MPI_COMM_WORLD);}
 		if (world_rank == 0){
-			MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, world_size-1, 1,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-			acceleration_x[number_particles_local-1] = recv_buffer;
+			MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, world_size-1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			acceleration_x[number_particles_local-1] += recv_buffer;
 		}
 		else {
-			MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, world_rank-1, 1,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-			acceleration_x[number_particles_local-1] = recv_buffer;
+			MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, world_rank-1, 1,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+			acceleration_x[number_particles_local-1] += recv_buffer;
 		}
 		
 		runIntegration.update_velocity(velocity_x, acceleration_x);
@@ -105,15 +109,15 @@ int main(){
 		runForces.polynomicForce(position_x, acceleration_x);
 		
 		// communicate that single force
-		if (world_rank+1 == world_size){MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, 0, 1,MPI_COMM_WORLD,MPI_STATUS_IGNORE);}
-		else{MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, world_rank+1, 1,MPI_COMM_WORLD,MPI_STATUS_IGNORE);}
+		if (world_rank+1 == world_size){MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);}
+		else{MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, world_rank+1, 1, MPI_COMM_WORLD);}
 		if (world_rank == 0){
 			MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, world_size-1, 1,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-			acceleration_x[number_particles_local-1] = recv_buffer;
+			acceleration_x[number_particles_local-1] += recv_buffer;
 		}
 		else {
 			MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, world_rank-1, 1,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-			acceleration_x[number_particles_local-1] = recv_buffer;
+			acceleration_x[number_particles_local-1] += recv_buffer;
 		}
 		
 		runIntegration.update_velocity(velocity_x, acceleration_x);
@@ -122,13 +126,22 @@ int main(){
 			energy_vector = properties.getEnergy(position_x, velocity_x);
 			// communicate energy_vector
 			if (world_rank != 0){
-				MPI_Send();
+				MPI_Send(&energy_vector[0], 1, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);
+				MPI_Send(&energy_vector[1], 1, MPI_DOUBLE, 0, 2, MPI_COMM_WORLD);
 			}
 			if (world_rank == 0){
-				MPI_Recv();
+				total_kinetic_energy = energy_vector[0];
+				total_potential_energy = energy_vector[1];
+				for (int i=1; i<world_size; i++){
+					MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, i, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					total_kinetic_energy += recv_buffer;
+					MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, i, 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+					total_potential_energy += recv_buffer;
+				}
+				results.writeEnergy(total_kinetic_energy, total_potential_energy);				
 			}
 		}
-		
 	}
 	if (world_rank == 0){results.close_output_files();}
+	MPI_Finalize();
 };

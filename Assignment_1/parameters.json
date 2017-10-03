@@ -2,6 +2,7 @@
 	"a": 1.0,
 	"b": 0.0,
 	"c": 0.0,
+	"mass": 1.0,
 	"number_particles": 10,
 	"delta": 0.1,
 	"number_steps": 100,

@@ -17,15 +17,16 @@ class Forces{
 		
 		void polynomicForce(const vector<double>& position_x, vector<double>& acceleration_x){
 			double Force;
+			// accelation needs to be set to zero.
 			for (int i=0; i<number_particles; i++){
 				acceleration_x[i] = 0.0;
 			}
 			
 			for (int i=0; i<number_particles-1; i++){
 				Force = 0.0;
-				// might or not might give significant overhead 
+				// might or might not give significant overhead 
 				// checkig a, b and c for every evaluation.
-				// could be split up in more functions, if overhead is found.
+				// Could be split up in more functions, if overhead is found.
 				if (a != 0.0){Force += a*(position_x[i] - position_x[i+1]);}
 				if (b != 0.0){Force += b*(position_x[i] - position_x[i+1])*(position_x[i] - position_x[i+1]);}
 				if (c != 0.0){Force += c*(position_x[i] - position_x[i+1])*(position_x[i] - position_x[i+1])*(position_x[i] - position_x[i+1]);}

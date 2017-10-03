@@ -5,7 +5,7 @@
 #include<cmath>
 #include "integrators.h"
 #include "forces.h"
-#include "printresults.h"
+//#include "printresults.h"
 #include "properties.h"
 #include"json.hpp"
 
@@ -20,8 +20,10 @@ int main(){
 	int world_rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 	
+	/*
 	print_results results(0);
 	results.checkInput(world_size);
+	*/
 	
 	// assign all variables
 	double mass, integration_step, delta, a, b, c, recv_buffer, total_kinetic_energy, total_potential_energy;
@@ -114,9 +116,9 @@ int main(){
 	calc_properties properties(number_particles_local, a, b, c, mass);
 	
 	for (int i=0; i<number_steps; i++){
+		if(world_rank==0){cout << velocity_x[2] << ' ' << i << ' ' << world_rank << '\n';}
 		// ALL RANKS
 		runForces.polynomicForce(position_x, acceleration_x);
-		
 		// communicate force
 		// The zeroth index of a process is the same as the last index of the process with one rank lower_bound
 		// first the acceleration is acculamted at the zeroth index.
@@ -173,6 +175,7 @@ int main(){
 		// ALL RANKS
 		runIntegration.update_velocity(velocity_x, acceleration_x);
 		
+		/*
 		if (i%print_frequency == 0){
 			energy_vector = properties.getEnergy(position_x, velocity_x);
 			// communicate energy_vector
@@ -192,7 +195,8 @@ int main(){
 				results.writeEnergy(total_kinetic_energy, total_potential_energy);				
 			}
 		}
+		*/
 	}
-	results.close_output_files();
+	//results.close_output_files();
 	MPI_Finalize();
 };

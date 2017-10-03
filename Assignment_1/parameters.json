@@ -3,8 +3,9 @@
 	"b": 0.0,
 	"c": 0.0,
 	"mass": 1.0,
-	"number_particles": 10,
+	"number_particles": 100,
 	"delta": 0.1,
-	"number_steps": 100,
-	"print_frequency": 1
+	"number_steps": 10,
+	"print_frequency": 100,
+	"integration_step": 0.001
 }

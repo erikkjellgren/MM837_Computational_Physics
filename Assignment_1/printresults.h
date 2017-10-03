@@ -13,11 +13,13 @@ class print_results{
 	FILE * outputfile;
 	double needonevalue;
 	public:
-		print_results(const double needonevalue_){
+		print_results(const double& needonevalue_){
 			needonevalue = needonevalue_;
-			energyfile = fopen("energy.txt", "w");
-			velocityfile = fopen("velocities.txt","w");
-			outputfile = fopen("output.txt","w");
+			if (needonevalue==0){
+				energyfile = fopen("energy.txt", "w");
+				velocityfile = fopen("velocities.txt","w");
+				outputfile = fopen("output.txt","w");
+			}
 		}
 		
 		

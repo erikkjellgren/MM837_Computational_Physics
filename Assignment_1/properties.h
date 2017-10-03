@@ -7,7 +7,7 @@ class calc_properties{
 	int number_particles;
 	double a, b, c, mass;
 	public:
-		print_results(const int& number_particles_, const double& a_, const double& b_, const double& c_, const double mass_){
+		calc_properties(const int& number_particles_, const double& a_, const double& b_, const double& c_, const double mass_){
 			number_particles = number_particles_;
 			a = a_;
 			b = b_;

@@ -5,7 +5,7 @@
 	"mass": 1.0,
 	"number_particles": 100,
 	"delta": 0.1,
-	"number_steps": 10,
+	"number_steps": 100000,
 	"print_frequency": 100,
-	"integration_step": 0.001
+	"integration_step": 1.0
 }

@@ -19,8 +19,9 @@ class getresults{
 			vector<double> energy_vector;
 			double kintetic_energy = 0.0;
 			double potential_energy = 0.0;
-			for (int i=0; i<number_particles-1; i++){
-				ip1=i+1;
+			for (int i=0; i<number_particles; i++){
+				if (i==number_particles-1){ip1=0;}
+				else{ip1=i+1;}
 				kintetic_energy += velocity_x[i]*velocity_x[i];
 				if (a != 0.0){potential_energy += 0.5*a*(position_x[i] - position_x[ip1])*(position_x[i] - position_x[ip1]);}
 				if (b != 0.0){potential_energy += 1.0/3.0*b*(position_x[i] - position_x[ip1])*(position_x[i] - position_x[ip1])*(position_x[i] - position_x[ip1]);}

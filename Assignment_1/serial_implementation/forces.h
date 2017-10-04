@@ -21,9 +21,10 @@ class Forces{
 				acceleration_x[i] = 0.0;
 			}
 			
-			for (int i=0; i<number_particles-1; i++){
+			for (int i=0; i<number_particles; i++){
 				Force = 0.0;
-				ip1=i+1;
+				if (i==number_particles-1){ip1=0;}
+				else{ip1=i+1;}
 				if (a != 0.0){Force += a*(position_x[i] - position_x[ip1]);}
 				if (b != 0.0){Force += b*(position_x[i] - position_x[ip1])*(position_x[i] - position_x[ip1]);}
 				if (c != 0.0){Force += c*(position_x[i] - position_x[ip1])*(position_x[i] - position_x[ip1])*(position_x[i] - position_x[ip1]);}

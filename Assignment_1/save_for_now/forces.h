@@ -5,7 +5,7 @@ using namespace std;
 
 class Forces{
 	double a, b, c, mass_inverse;
-	int number_particles, ip1;
+	int number_particles;
 	public:
 		Forces(const double& a_, const double& b_, const double& c_, const int& number_particles_, const double& mass_){
 			a = a_;
@@ -17,18 +17,21 @@ class Forces{
 		
 		void polynomicForce(const vector<double>& position_x, vector<double>& acceleration_x){
 			double Force;
+			// accelation needs to be set to zero.
 			for (int i=0; i<number_particles; i++){
 				acceleration_x[i] = 0.0;
 			}
 			
 			for (int i=0; i<number_particles-1; i++){
 				Force = 0.0;
-				ip1=i+1;
-				if (a != 0.0){Force += a*(position_x[i] - position_x[ip1]);}
-				if (b != 0.0){Force += b*(position_x[i] - position_x[ip1])*(position_x[i] - position_x[ip1]);}
-				if (c != 0.0){Force += c*(position_x[i] - position_x[ip1])*(position_x[i] - position_x[ip1])*(position_x[i] - position_x[ip1]);}
+				// might or might not give significant overhead 
+				// checkig a, b and c for every evaluation.
+				// Could be split up in more functions, if overhead is found.
+				if (a != 0.0){Force += a*(position_x[i] - position_x[i+1]);}
+				if (b != 0.0){Force += b*(position_x[i] - position_x[i+1])*(position_x[i] - position_x[i+1]);}
+				if (c != 0.0){Force += c*(position_x[i] - position_x[i+1])*(position_x[i] - position_x[i+1])*(position_x[i] - position_x[i+1]);}
 				acceleration_x[i]   -= Force*mass_inverse;
-				acceleration_x[ip1] += Force*mass_inverse;
-				}
+				acceleration_x[i+1] += Force*mass_inverse;
+			}
 		}
 };

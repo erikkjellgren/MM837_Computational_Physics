@@ -26,10 +26,11 @@ int main(){
 	// check inputfile
 	if (world_rank==0){results.checkInput(world_size);}
 	
-	double mass, integration_step, delta, a, b, c, recv_buffer, total_kinetic_energy, total_potential_energy;
+	double mass, integration_step, delta, a, b, c, recv_buffer, total_kinetic_energy, total_potential_energy, hist_max_velocity, hist_min_velocity;
 	const double pi = 3.141592653589793238462643383279;
-	int number_particles_global, number_steps, number_particles_local, print_frequency, right_neighbour, left_neighbour;
+	int number_particles_global, number_steps, number_particles_local, sample_frequency, right_neighbour, left_neighbour, equilibration_steps, hist_velocity_bins, recv_buffer_int;
 	vector<double> position_x, velocity_x, acceleration_x, energy_vector, initial_help_vector;
+	vector<int> hist_velocity;
 	
 	// load parameters in from world_rank == 0, communicate parameters
 	// it is assumed that the parameter file only exist on the machine
@@ -44,8 +45,12 @@ int main(){
 		delta = j["delta"];
 		number_particles_global = j["number_particles"];
 		number_steps = j["number_steps"];
-		print_frequency = j["print_frequency"];
+		sample_frequency = j["sample_frequency"];
 		integration_step = j["integration_step"];
+		equilibration_steps = j["equilibration_steps"];
+		hist_velocity_bins = j["hist_velocity_bins"];
+		hist_max_velocity = j["hist_max_velocity"];
+		hist_min_velocity = j["hist_min_velocity"];
 		// pretty ugly way to send it out. There must be
 		// a better solution. Maybe broadcast?
 		for (int i=1; i<world_size; i++){
@@ -56,8 +61,11 @@ int main(){
 			MPI_Send(&delta,1,MPI_DOUBLE,i,5,MPI_COMM_WORLD);
 			MPI_Send(&number_particles_global,1,MPI_INT,i,6,MPI_COMM_WORLD);
 			MPI_Send(&number_steps,1,MPI_INT,i,7,MPI_COMM_WORLD);
-			MPI_Send(&print_frequency,1,MPI_INT,i,8,MPI_COMM_WORLD);
+			MPI_Send(&sample_frequency,1,MPI_INT,i,8,MPI_COMM_WORLD);
 			MPI_Send(&integration_step,1,MPI_DOUBLE,i,9,MPI_COMM_WORLD);
+			MPI_Send(&equilibration_steps,1,MPI_DOUBLE,i,10,MPI_COMM_WORLD);
+			MPI_Send(&hist_max_velocity,1,MPI_DOUBLE,i,11,MPI_COMM_WORLD);
+			MPI_Send(&hist_min_velocity,1,MPI_DOUBLE,i,12,MPI_COMM_WORLD);
 		}
 	}
 	if (world_rank!=0){
@@ -68,10 +76,17 @@ int main(){
 		MPI_Recv(&delta,1,MPI_DOUBLE,0,5,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 		MPI_Recv(&number_particles_global,1,MPI_INT,0,6,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 		MPI_Recv(&number_steps,1,MPI_INT,0,7,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
-		MPI_Recv(&print_frequency,1,MPI_INT,0,8,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		MPI_Recv(&sample_frequency,1,MPI_INT,0,8,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 		MPI_Recv(&integration_step,1,MPI_DOUBLE,0,9,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		MPI_Recv(&equilibration_steps,1,MPI_DOUBLE,0,10,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		MPI_Recv(&hist_max_velocity,1,MPI_DOUBLE,0,11,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		MPI_Recv(&hist_min_velocity,1,MPI_DOUBLE,0,12,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
 	}
-
+	
+	// Make vector to store bined velocities
+	for (int i=0; i<hist_velocity_bins; i++){
+		hist_velocity.push_back(0);
+	}
 
 	// Making vector containing start i for the processes.
 	// if numer_of_particles differ, between the processes, this is needed.
@@ -116,7 +131,7 @@ int main(){
 	if (world_rank==0){left_neighbour = world_size-1;}
 	else {left_neighbour = world_rank-1;}
 	
-	for (int i=1; i<number_steps+1; i++){
+	for (int i=1; i<number_steps+equilibration_steps+1; i++){
 		polynomicForce(position_x, acceleration_x, a, b, c, mass);
 
 		MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, right_neighbour, 1, MPI_COMM_WORLD);
@@ -147,7 +162,7 @@ int main(){
 		update_velocity(velocity_x, acceleration_x, integration_step);
 		
 		
-		if (i%print_frequency == 0){
+		if (i%sample_frequency == 0 && i > equilibration_steps){
 			// code calc velocity distribution
 			energy_vector = getEnergy(position_x, velocity_x, a, b, c, mass);
 			// communicate energy_vector
@@ -164,11 +179,26 @@ int main(){
 					MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, i, 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 					total_potential_energy += recv_buffer;
 				}
-				results.writeEnergy(total_kinetic_energy, total_potential_energy);			
+				results.writeEnergy(total_kinetic_energy, total_potential_energy, (i-equilibration_steps)*integration_step);			
 			}
 		}
 	}
 	// code writeout velocity distribution
+	if (world_rank != 0){
+		for (int i=0; i<hist_velocity_bins; i++){
+			MPI_Send(&hist_velocity[i], 1, MPI_INT, 0, i, MPI_COMM_WORLD);
+		}
+	}
+	if (world_rank == 0){
+		for (int j=1; j<world_size; j++){
+			for (int i=0; i<hist_velocity_bins; i++){
+				MPI_Recv(&recv_buffer_int, 1, MPI_INT, j, i, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+				hist_velocity[i] += recv_buffer_int;
+			}
+		}
+		results.writeVelocityDistribution(hist_velocity);
+	}
+
 	// close output files
 	if(world_rank==0){results.close_output_files();}
 	MPI_Finalize();

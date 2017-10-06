@@ -2,6 +2,7 @@
 *.run
 a.out
 *.exe
+*.o
 
 # From Cmake
 CMakeCache.txt

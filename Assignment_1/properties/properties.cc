@@ -21,7 +21,10 @@ vector<double> getEnergy(const vector<double>& position_x, const vector<double>&
 	return energy_vector;
 }
 
-void binVelocities(const vector<double>& velocity_x){
-	
+void binVelocities(const vector<double>& velocity_x, vector<int>& hist_velocity, const double& max_velocity, const double& min_velocity){
+	int number_particles = velocity_x.size();
+	for (int i=0; i<number_particles; i++){
+		
+	}
 }
 

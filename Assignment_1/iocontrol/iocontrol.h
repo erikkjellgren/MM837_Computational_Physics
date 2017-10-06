@@ -19,6 +19,13 @@ class print_results{
 				energyfile = fopen("energy.txt", "w");
 				velocitydistributionfile = fopen("velocitydistribution.txt","w");
 				outputfile = fopen("output.txt","w");
+				
+				fprintf(energyfile, "Time");
+				fprintf(energyfile, " ");
+				fprintf(energyfile, "Ekin");
+				fprintf(energyfile, " ");
+				fprintf(energyfile, "Epot");
+				fprintf(energyfile, "\n");	
 			}
 		}
 		
@@ -49,7 +56,9 @@ class print_results{
 		}
 		
 		
-		void writeEnergy(const double& kinetic_energy, const double& potential_energy){
+		void writeEnergy(const double& kinetic_energy, const double& potential_energy, const double& time){
+			fprintf(energyfile, "%f", time);
+			fprintf(energyfile, " ");
 			fprintf(energyfile, "%f", kinetic_energy);
 			fprintf(energyfile, " ");
 			fprintf(energyfile, "%f", potential_energy);
@@ -57,8 +66,12 @@ class print_results{
 		}
 		
 		
-		void writeVelocityDistribution(){
-			
+		void writeVelocityDistribution(const vector<int>& velocitydist){
+			int bins = velocitydist.size();
+			for (int i=0; i<bins; i++){
+				fprintf(velocitydistributionfile, "%d", velocitydist[i]);
+				fprintf(velocitydistributionfile, "\n");
+			}
 		}
 		
 };

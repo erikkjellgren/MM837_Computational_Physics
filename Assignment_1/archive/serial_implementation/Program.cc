@@ -10,7 +10,7 @@ using namespace std;
 int main(){
 	double mass=1.0, integration_step=0.01, delta=0.1, a=1.0, b=0.0, c=0.0;
 	const double pi = 3.141592653589793238462643383279;
-	int number_particles=100, steps=100000;
+	int number_particles=100, steps=10000;
 	vector<double> position_x, velocity_x, acceleration_x, energy_vector;
 
 	// Setup the system

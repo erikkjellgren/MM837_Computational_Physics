@@ -2,9 +2,9 @@
 #include<mpi.h>
 #include<iostream>
 #include<cmath>
-#include "integrators.h"
-#include "forces.h"
-#include "printresults.h"
+#include "integrators/integrators.h"
+#include "forces/forces.h"
+#include "properties/printresults.h"
 
 using namespace std;
 
@@ -19,7 +19,7 @@ int main(){
 	
 	double mass=1.0, integration_step=0.01, delta=0.1, a=1.0, b=0.0, c=0.0, recv_buffer, total_kinetic_energy, total_potential_energy;
 	const double pi = 3.141592653589793238462643383279;
-	int number_particles_global=100, steps=100000, number_particles_local, print_frequency=1;
+	int number_particles_global=1e+8, steps=10, number_particles_local, print_frequency=1, right_neighbour, left_neighbour;
 	vector<double> position_x, velocity_x, acceleration_x, energy_vector, initial_help_vector;
 
 	// Making vector containing start i for the processes.
@@ -59,74 +59,45 @@ int main(){
 	// the last particle of the last process, need to have same condition as the first particle, i.e. i==0
 	if (world_rank==world_size-1){velocity_x[number_particles_local-1] = sin(2.0*pi*(delta)/((double)number_particles_global));}
 	
-	
-	integrators runIntegration(integration_step, number_particles_local);
-	Forces runForces(a, b, c, number_particles_local, mass);
-	getresults results(number_particles_local, a, b, c, mass);
+	// calculate MPI neighbours
+	if (world_rank+1==world_size){right_neighbour = 0;}
+	else {right_neighbour = world_rank+1;}
+	if (world_rank==0){left_neighbour = world_size-1;}
+	else {left_neighbour = world_rank-1;}
 	
 	for (int i=0; i<steps; i++){
-		//for (int j=0; j<number_particles_local; j++)
-		//	cout << "step " << i << "particle " << j << ' ' << position_x[j] << ' ' << velocity_x[j] << ' ' << acceleration_x[j] << ' ' << world_rank << '\n';
-		
-		
-		
-		runForces.polynomicForce(position_x, acceleration_x);
-				if (world_rank+1 == world_size){MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);}
-		else{MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, world_rank+1, 1, MPI_COMM_WORLD);}
-		if (world_rank == 0){
-			MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, world_size-1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			acceleration_x[0] += recv_buffer;
-		}
-		else {
-			MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, world_rank-1, 1,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			acceleration_x[0] += recv_buffer;
-		}
+		polynomicForce(position_x, acceleration_x, a, b, c, mass);
+
+		MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, right_neighbour, 1, MPI_COMM_WORLD);
+		MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, left_neighbour, 1,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		acceleration_x[0] += recv_buffer;
 		// The accelerations have been accumulated in the zeroth index at the rank+1 process
 		// now the total acceleration is send back to the last index of the rank process (rank-1 now)
-		if (world_rank == 0){MPI_Send(&acceleration_x[0], 1, MPI_DOUBLE, world_size-1, 1, MPI_COMM_WORLD);}
-		else{MPI_Send(&acceleration_x[0], 1, MPI_DOUBLE, world_rank-1, 1, MPI_COMM_WORLD);}
-		if (world_rank+1 == world_size){
-			MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			acceleration_x[number_particles_local-1] = recv_buffer;
-		}
-		else {
-			MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, world_rank+1, 1,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			acceleration_x[number_particles_local-1] = recv_buffer;
-		}
+		MPI_Send(&acceleration_x[0], 1, MPI_DOUBLE, left_neighbour, 1, MPI_COMM_WORLD);
+		MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, right_neighbour, 1,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		acceleration_x[number_particles_local-1] = recv_buffer;
+
 		
+		update_velocity(velocity_x, acceleration_x, integration_step);
+		update_position(position_x, velocity_x, integration_step);
+		polynomicForce(position_x, acceleration_x, a, b, c, mass);
+
 		
-		runIntegration.update_velocity(velocity_x, acceleration_x);
-		runIntegration.update_position(position_x, velocity_x);
-		runForces.polynomicForce(position_x, acceleration_x);
-				if (world_rank+1 == world_size){MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);}
-		else{MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, world_rank+1, 1, MPI_COMM_WORLD);}
-		if (world_rank == 0){
-			MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, world_size-1, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			acceleration_x[0] += recv_buffer;
-		}
-		else {
-			MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, world_rank-1, 1,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			acceleration_x[0] += recv_buffer;
-		}
+		MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, right_neighbour, 1, MPI_COMM_WORLD);
+		MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, left_neighbour, 1,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		acceleration_x[0] += recv_buffer;
 		// The accelerations have been accumulated in the zeroth index at the rank+1 process
 		// now the total acceleration is send back to the last index of the rank process (rank-1 now)
-		if (world_rank == 0){MPI_Send(&acceleration_x[0], 1, MPI_DOUBLE, world_size-1, 1, MPI_COMM_WORLD);}
-		else{MPI_Send(&acceleration_x[0], 1, MPI_DOUBLE, world_rank-1, 1, MPI_COMM_WORLD);}
-		if (world_rank+1 == world_size){
-			MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			acceleration_x[number_particles_local-1] = recv_buffer;
-		}
-		else {
-			MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, world_rank+1, 1,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			acceleration_x[number_particles_local-1] = recv_buffer;
-		}
+		MPI_Send(&acceleration_x[0], 1, MPI_DOUBLE, left_neighbour, 1, MPI_COMM_WORLD);
+		MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, right_neighbour, 1,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		acceleration_x[number_particles_local-1] = recv_buffer;
 		
 		
-		runIntegration.update_velocity(velocity_x, acceleration_x);
+		update_velocity(velocity_x, acceleration_x, integration_step);
 		
 		
 		if (i%print_frequency == 0){
-			energy_vector = results.getEnergy(position_x, velocity_x);
+			energy_vector = getEnergy(position_x, velocity_x, a, b, c, mass);
 			// communicate energy_vector
 			if (world_rank != 0){
 				MPI_Send(&energy_vector[0], 1, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);

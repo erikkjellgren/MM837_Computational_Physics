@@ -25,7 +25,12 @@ class print_results{
 				fprintf(energyfile, "Ekin");
 				fprintf(energyfile, " ");
 				fprintf(energyfile, "Epot");
-				fprintf(energyfile, "\n");	
+				fprintf(energyfile, "\n");
+				
+				fprintf(velocitydistributionfile, "Velocity");
+				fprintf(velocitydistributionfile, " ");
+				fprintf(velocitydistributionfile, "Count");
+				fprintf(velocitydistributionfile, "\n");
 			}
 		}
 		
@@ -66,12 +71,17 @@ class print_results{
 		}
 		
 		
-		void writeVelocityDistribution(const vector<int>& velocitydist){
+		void writeVelocityDistribution(const vector<long>& velocitydist, const double& max_velocity, const double& min_velocity){
 			int bins = velocitydist.size();
-			for (int i=0; i<bins; i++){
-				fprintf(velocitydistributionfile, "%d", velocitydist[i]);
+			for (int i=0; i<bins-1; i++){
+				fprintf(velocitydistributionfile, "%f", min_velocity+(max_velocity-min_velocity)/((double)bins)*(i+0.5));
+				fprintf(velocitydistributionfile, " ");
+				fprintf(velocitydistributionfile, "%ld", velocitydist[i]);
 				fprintf(velocitydistributionfile, "\n");
 			}
+			fprintf(velocitydistributionfile, "Out-of-bounds ");
+			fprintf(velocitydistributionfile, "%ld", velocitydist[bins-1]);
+			fprintf(velocitydistributionfile, "\n");
 		}
 		
 };

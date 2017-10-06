@@ -9,12 +9,17 @@ set(SOURCES src/forces.cc
 			src/Program.cc)
 
 find_package(MPI REQUIRED)
-
-include_directories(${MPI_INCLUDE_PATH})		
+	
 include_directories(include)
 include_directories(external)
 			
 set( EXECUTABLE_OUTPUT_PATH ..)
 add_executable(Program.run ${SOURCES})
 
-target_link_libraries(Program.run PRIVATE ${MPI_C_LIBRARIES})
+target_link_libraries(Program.run
+  PRIVATE
+  ${MPI_CXX_LIBRARIES})
+
+target_include_directories(Program.run
+  PRIVATE
+  ${MPI_CXX_INCLUDE_PATH}) 

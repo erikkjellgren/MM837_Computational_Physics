@@ -1,5 +1,6 @@
 
 #include<vector>
+#include<iostream>
 
 using namespace std;
 
@@ -21,10 +22,18 @@ vector<double> getEnergy(const vector<double>& position_x, const vector<double>&
 	return energy_vector;
 }
 
-void binVelocities(const vector<double>& velocity_x, vector<int>& hist_velocity, const double& max_velocity, const double& min_velocity){
-	int number_particles = velocity_x.size();
+void binVelocities(const vector<double>& velocity_x, vector<long>& hist_velocity, const double& max_velocity, const double& min_velocity){
+	// bining the velocities by a Bucket sort algorithm
+	const int number_particles = velocity_x.size(), buckets = hist_velocity.size();
+	const double bucketSize = (max_velocity - min_velocity)/((double)buckets);
+	int bucketIndex;
 	for (int i=0; i<number_particles; i++){
-		
+		if (velocity_x[i] > max_velocity){hist_velocity[buckets-1] += 1;}
+		else if (velocity_x[i] < min_velocity){hist_velocity[buckets-1] += 1;}
+		else{
+			bucketIndex = int((velocity_x[i] - min_velocity)/bucketSize);
+			hist_velocity[bucketIndex] += 1;
+		}
 	}
 }
 

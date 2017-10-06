@@ -3,11 +3,11 @@
 #include<iostream>
 #include<fstream>
 #include<cmath>
-#include "integrators/integrators.h"
-#include "forces/forces.h"
-#include "properties/properties.h"
-#include "iocontrol/iocontrol.h"
-#include "external/json.hpp"
+#include "integrators.h"
+#include "forces.h"
+#include "properties.h"
+#include "iocontrol.h"
+#include "json.hpp"
 
 using namespace std;
 using json = nlohmann::json;
@@ -184,6 +184,7 @@ int main(){
 		}
 	}
 	// code writeout velocity distribution
+	/*
 	if (world_rank != 0){
 		for (int i=0; i<hist_velocity_bins; i++){
 			MPI_Send(&hist_velocity[i], 1, MPI_INT, 0, i, MPI_COMM_WORLD);
@@ -198,6 +199,7 @@ int main(){
 		}
 		results.writeVelocityDistribution(hist_velocity);
 	}
+	*/
 
 	// close output files
 	if(world_rank==0){results.close_output_files();}

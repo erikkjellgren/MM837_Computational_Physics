@@ -10,6 +10,7 @@ cmake_install.cmake
 CMakeFiles/
 Makefile
 
+build/
 
 # Specific 
 files
@@ -19,5 +20,4 @@ output3.100000.txt
 
 # From running scripts
 *.dat
-*.txt
 *.out

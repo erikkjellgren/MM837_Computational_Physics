@@ -16,9 +16,9 @@ class print_results{
 		print_results(const int& check_if_zero_){
 			check_if_zero = check_if_zero_;
 			if (check_if_zero==0){
-				energyfile = fopen("energy.txt", "w");
-				velocitydistributionfile = fopen("velocitydistribution.txt","w");
-				outputfile = fopen("output.txt","w");
+				energyfile = fopen("energy.dat", "w");
+				velocitydistributionfile = fopen("velocitydistribution.dat","w");
+				outputfile = fopen("output.dat","w");
 				
 				fprintf(energyfile, "Time");
 				fprintf(energyfile, " ");

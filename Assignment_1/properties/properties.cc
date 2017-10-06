@@ -20,3 +20,8 @@ vector<double> getEnergy(const vector<double>& position_x, const vector<double>&
 	energy_vector.push_back(potential_energy);
 	return energy_vector;
 }
+
+void binVelocities(const vector<double>& velocity_x){
+	
+}
+

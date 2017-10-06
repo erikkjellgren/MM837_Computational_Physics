@@ -1,12 +1,16 @@
 
 #include<mpi.h>
 #include<iostream>
+#include<fstream>
 #include<cmath>
 #include "integrators/integrators.h"
 #include "forces/forces.h"
-#include "properties/printresults.h"
+#include "properties/properties.h"
+#include "iocontrol/iocontrol.h"
+#include "external/json.hpp"
 
 using namespace std;
+using json = nlohmann::json;
 
 int main(){
 	// initialize the MPI
@@ -16,11 +20,58 @@ int main(){
 	int world_rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 	
+	// initialize class to control IO
+	print_results results(world_rank);
 	
-	double mass=1.0, integration_step=0.01, delta=0.1, a=1.0, b=0.0, c=0.0, recv_buffer, total_kinetic_energy, total_potential_energy;
+	// check inputfile
+	if (world_rank==0){results.checkInput(world_size);}
+	
+	double mass, integration_step, delta, a, b, c, recv_buffer, total_kinetic_energy, total_potential_energy;
 	const double pi = 3.141592653589793238462643383279;
-	int number_particles_global=1e+8, steps=10, number_particles_local, print_frequency=1, right_neighbour, left_neighbour;
+	int number_particles_global, number_steps, number_particles_local, print_frequency, right_neighbour, left_neighbour;
 	vector<double> position_x, velocity_x, acceleration_x, energy_vector, initial_help_vector;
+	
+	// load parameters in from world_rank == 0, communicate parameters
+	// it is assumed that the parameter file only exist on the machine
+	// with world_rank == 0
+	if (world_rank==0){
+		ifstream ifs("parameters.json");
+		json j = json::parse(ifs);
+		a = j["a"];
+		b = j["b"];
+		c = j["c"];
+		mass = j["mass"];
+		delta = j["delta"];
+		number_particles_global = j["number_particles"];
+		number_steps = j["number_steps"];
+		print_frequency = j["print_frequency"];
+		integration_step = j["integration_step"];
+		// pretty ugly way to send it out. There must be
+		// a better solution. Maybe broadcast?
+		for (int i=1; i<world_size; i++){
+			MPI_Send(&a,1,MPI_DOUBLE,i,1,MPI_COMM_WORLD);
+			MPI_Send(&b,1,MPI_DOUBLE,i,2,MPI_COMM_WORLD);
+			MPI_Send(&c,1,MPI_DOUBLE,i,3,MPI_COMM_WORLD);
+			MPI_Send(&mass,1,MPI_DOUBLE,i,4,MPI_COMM_WORLD);
+			MPI_Send(&delta,1,MPI_DOUBLE,i,5,MPI_COMM_WORLD);
+			MPI_Send(&number_particles_global,1,MPI_INT,i,6,MPI_COMM_WORLD);
+			MPI_Send(&number_steps,1,MPI_INT,i,7,MPI_COMM_WORLD);
+			MPI_Send(&print_frequency,1,MPI_INT,i,8,MPI_COMM_WORLD);
+			MPI_Send(&integration_step,1,MPI_DOUBLE,i,9,MPI_COMM_WORLD);
+		}
+	}
+	if (world_rank!=0){
+		MPI_Recv(&a,1,MPI_DOUBLE,0,1,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		MPI_Recv(&b,1,MPI_DOUBLE,0,2,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		MPI_Recv(&c,1,MPI_DOUBLE,0,3,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		MPI_Recv(&mass,1,MPI_DOUBLE,0,4,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		MPI_Recv(&delta,1,MPI_DOUBLE,0,5,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		MPI_Recv(&number_particles_global,1,MPI_INT,0,6,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		MPI_Recv(&number_steps,1,MPI_INT,0,7,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		MPI_Recv(&print_frequency,1,MPI_INT,0,8,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+		MPI_Recv(&integration_step,1,MPI_DOUBLE,0,9,MPI_COMM_WORLD,MPI_STATUS_IGNORE);
+	}
+
 
 	// Making vector containing start i for the processes.
 	// if numer_of_particles differ, between the processes, this is needed.
@@ -65,7 +116,7 @@ int main(){
 	if (world_rank==0){left_neighbour = world_size-1;}
 	else {left_neighbour = world_rank-1;}
 	
-	for (int i=0; i<steps; i++){
+	for (int i=1; i<number_steps+1; i++){
 		polynomicForce(position_x, acceleration_x, a, b, c, mass);
 
 		MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, right_neighbour, 1, MPI_COMM_WORLD);
@@ -76,7 +127,7 @@ int main(){
 		MPI_Send(&acceleration_x[0], 1, MPI_DOUBLE, left_neighbour, 1, MPI_COMM_WORLD);
 		MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, right_neighbour, 1,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		acceleration_x[number_particles_local-1] = recv_buffer;
-
+		
 		
 		update_velocity(velocity_x, acceleration_x, integration_step);
 		update_position(position_x, velocity_x, integration_step);
@@ -97,6 +148,7 @@ int main(){
 		
 		
 		if (i%print_frequency == 0){
+			// code calc velocity distribution
 			energy_vector = getEnergy(position_x, velocity_x, a, b, c, mass);
 			// communicate energy_vector
 			if (world_rank != 0){
@@ -112,9 +164,12 @@ int main(){
 					MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, i, 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 					total_potential_energy += recv_buffer;
 				}
-				cout << total_kinetic_energy << ' ' << total_potential_energy << '\n';				
+				results.writeEnergy(total_kinetic_energy, total_potential_energy);			
 			}
 		}
 	}
+	// code writeout velocity distribution
+	// close output files
+	if(world_rank==0){results.close_output_files();}
 	MPI_Finalize();
 };

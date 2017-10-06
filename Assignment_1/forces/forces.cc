@@ -1,4 +1,5 @@
 
+#include<mpi.h>
 #include<vector>
 
 using namespace std;

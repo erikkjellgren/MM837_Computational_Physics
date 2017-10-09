@@ -9,7 +9,7 @@
 	"sample_frequency": 1,
 	"integration_step": 0.01,
 	"equilibration_steps": 1000000,
-	"hist_velocity_bins": 100,
+	"hist_velocity_bins": 1000,
 	"hist_max_velocity": 1.1,
 	"hist_min_velocity": -1.1
 }

@@ -26,9 +26,9 @@ int main(){
 	// check inputfile
 	if (world_rank==0){results.checkInput(world_size);}
 	
-	double mass, integration_step, delta, a, b, c, recv_buffer, total_kinetic_energy, total_potential_energy, hist_max_velocity, hist_min_velocity;
+	double mass, integration_step, delta, a, b, c, hist_max_velocity, hist_min_velocity;
 	const double pi = 3.141592653589793238462643383279;
-	int number_particles_global, number_steps, number_particles_local, sample_frequency, right_neighbour, left_neighbour, equilibration_steps, hist_velocity_bins, recv_buffer_int;
+	int number_particles_global, number_steps, number_particles_local, sample_frequency, equilibration_steps, hist_velocity_bins, recv_buffer_int;
 	vector<double> position_x, velocity_x, acceleration_x, energy_vector, initial_help_vector;
 	vector<long> hist_velocity;
 	
@@ -127,68 +127,25 @@ int main(){
 	
 	// the last particle of the last process, need to have same condition as the first particle, i.e. i==0
 	if (world_rank==world_size-1){velocity_x[number_particles_local-1] = sin(2.0*pi*(delta)/((double)number_particles_global));}
-	
-	// calculate MPI neighbours
-	if (world_rank+1==world_size){right_neighbour = 0;}
-	else {right_neighbour = world_rank+1;}
-	if (world_rank==0){left_neighbour = world_size-1;}
-	else {left_neighbour = world_rank-1;}
 
-	
+	// Run the actual program
 	for (int i=1; i<number_steps+equilibration_steps+1; i++){
-		polynomicForce(position_x, acceleration_x, a, b, c, mass);
-
-		MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, right_neighbour, 1, MPI_COMM_WORLD);
-		MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, left_neighbour, 1,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		acceleration_x[0] += recv_buffer;
-		// The accelerations have been accumulated in the zeroth index at the rank+1 process
-		// now the total acceleration is send back to the last index of the rank process (rank-1 now)
-		MPI_Send(&acceleration_x[0], 1, MPI_DOUBLE, left_neighbour, 1, MPI_COMM_WORLD);
-		MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, right_neighbour, 1,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		acceleration_x[number_particles_local-1] = recv_buffer;
-		
-		
+		polynomicForce(position_x, acceleration_x, a, b, c, mass, world_rank, world_size);
 		update_velocity(velocity_x, acceleration_x, integration_step);
 		update_position(position_x, velocity_x, integration_step);
-		polynomicForce(position_x, acceleration_x, a, b, c, mass);
-
-		
-		MPI_Send(&acceleration_x[number_particles_local-1], 1, MPI_DOUBLE, right_neighbour, 1, MPI_COMM_WORLD);
-		MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, left_neighbour, 1,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		acceleration_x[0] += recv_buffer;
-		// The accelerations have been accumulated in the zeroth index at the rank+1 process
-		// now the total acceleration is send back to the last index of the rank process (rank-1 now)
-		MPI_Send(&acceleration_x[0], 1, MPI_DOUBLE, left_neighbour, 1, MPI_COMM_WORLD);
-		MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, right_neighbour, 1,MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-		acceleration_x[number_particles_local-1] = recv_buffer;
-		
-		
+		polynomicForce(position_x, acceleration_x, a, b, c, mass, world_rank, world_size);
 		update_velocity(velocity_x, acceleration_x, integration_step);
 		
 		if (i%sample_frequency == 0 && i > equilibration_steps){
 			binVelocities(velocity_x, hist_velocity, hist_max_velocity, hist_min_velocity);
-			energy_vector = getEnergy(position_x, velocity_x, a, b, c, mass);
-			// communicate energy_vector
-			if (world_rank != 0){
-				MPI_Send(&energy_vector[0], 1, MPI_DOUBLE, 0, 1, MPI_COMM_WORLD);
-				MPI_Send(&energy_vector[1], 1, MPI_DOUBLE, 0, 2, MPI_COMM_WORLD);
-			}
-			if (world_rank == 0){
-				total_kinetic_energy = energy_vector[0];
-				total_potential_energy = energy_vector[1];
-				for (int i=1; i<world_size; i++){
-					MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, i, 1, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-					total_kinetic_energy += recv_buffer;
-					MPI_Recv(&recv_buffer, 1, MPI_DOUBLE, i, 2, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-					total_potential_energy += recv_buffer;
-				}
-				results.writeEnergy(total_kinetic_energy, total_potential_energy, (i-equilibration_steps)*integration_step);			
-			}
+			energy_vector = getEnergy(position_x, velocity_x, a, b, c, mass, world_rank, world_size);
+			if (world_rank == 0){results.writeEnergy(energy_vector[0], energy_vector[1], (i-equilibration_steps)*integration_step);}			
 		}
 	}
+	
 	// code writeout velocity distribution
 	if (world_rank != 0){
-		for (int i=0; i<hist_velocity_bins++1; i++){
+		for (int i=0; i<hist_velocity_bins+1; i++){
 			MPI_Send(&hist_velocity[i], 1, MPI_INT, 0, i, MPI_COMM_WORLD);
 		}
 	}

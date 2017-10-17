@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 def velocityhistogram():
     data = np.genfromtxt("velocitydistribution.dat",skip_header=1,skip_footer=1)
-    plt.hist(data[:,0],len(data), weights=data[:,1],linewidth=0)
+    plt.hist(data[:,0]**2,len(data), weights=data[:,1],linewidth=0)
     plt.show()
 
 def plot_energy():

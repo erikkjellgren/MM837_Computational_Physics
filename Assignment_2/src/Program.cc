@@ -8,15 +8,21 @@
 #include "potentials.h"
 #include "integrators.h"
 #include "wavefunction.h"
+#include "iocontrol.h"
 #include "json.hpp"
 
 using namespace std;
 using json = nlohmann::json;
 
-int main(int argc, char** argv) {
+int main() {
 	int iteration, iterations_max, x_match, ode_steps_left, ode_steps_right, ode_steps, potential_type, NewtonRapshon;
 	double check, check_old, x_min, x_max, tol, energy, delta_energy, k1, k2, x_match_parameter_1, x_match_parameter_2;
 	double ode_step_size, q0_left, q0_right, p0_left, p0_right, qn_left, qn_right, pn_left, pn_right, delta_check;
+	vector<double> properties;
+	
+	// Initialize iocontrol
+	print_results results(1);
+	results.write_input();
 	
 	// Load parameters from file
 	ifstream ifs("parameters.json");
@@ -58,16 +64,8 @@ int main(int argc, char** argv) {
 	vector<double> delta_phi(ode_steps, 0.0); 
 	vector<double> x_value(ode_steps, 0.0);
 	vector<double> potential_value(ode_steps, 0.0);
-
-	string phi_file("phi.dat");
-	ofstream fout(phi_file.c_str());
-
-
-	cout << "energy = " << energy <<endl;
-
 	
 	for (int iteration=0 ; iteration< iterations_max; iteration++) { 
-		
 		Potentials potential(energy, k1, k2, potential_type); 
 		RK4Integrator<Potentials> integrator_left(potential, ode_step_size);
 		integrator_left.setInitialConditions(qn_left,pn_left); 
@@ -106,16 +104,15 @@ int main(int argc, char** argv) {
 		}
 
 		pn_left *= qn_right/qn_left; 
-	
 		check = (pn_right - pn_left)/(fabs(pn_right) + fabs(pn_left));
 		
-		cout <<setprecision(10)<< "energy = "<<energy <<", pn_right = " << pn_right << ", pn_left = "<< pn_left << ", f = "<< check<< ", de=" << delta_energy<<endl;
+		results.write_iterations(energy, pn_right, pn_left, check, delta_energy);
 
 		if (fabs(check) < tol){break;}
 		if (iteration==0){;}
 		else if (NewtonRapshon==1){
 			delta_check = (check - check_old)/delta_energy;
-			if (fabs(delta_check) <= 1e-12){cout << "delta_check = 0, no NewtonRapshon step"<<'\n';}
+			if (fabs(delta_check) <= 1e-12){results.write_warning(1);}
 			else{
 			delta_energy = -check/delta_check;
 			}
@@ -126,21 +123,22 @@ int main(int argc, char** argv) {
 		check_old = check;
 		qn_left=q0_left; pn_left=p0_left;
 		qn_right=q0_right; pn_right=p0_right;
-
 	}
 
-	
-	if (iteration==iterations_max)
-		cout << "WARNING: max iterations reached" << endl;
+	if (iteration==iterations_max){results.write_warning(2);}
 	
 	wavefunction psi_fun(phi, delta_phi, x_value, potential_value, ode_step_size);
-	cout << psi_fun.position_expectation() << '\n';
-	cout << psi_fun.position2_expectation() << '\n';
-	cout << psi_fun.momentum_expectation() << '\n';
-	cout << psi_fun.momentum2_expectation() << '\n';
-	cout << psi_fun.potential_expectation() << '\n';
-	cout << psi_fun.hamiltonian_expectation() << '\n';
+	results.write_phi(x_value,psi_fun.return_wavefunction(), psi_fun.return_delta_wavefunction());
 	
-	return 0;
-
+	properties.push_back(psi_fun.return_norm());
+	properties.push_back(psi_fun.position_expectation());
+	properties.push_back(psi_fun.position2_expectation());
+	properties.push_back(psi_fun.momentum_expectation());
+	properties.push_back(psi_fun.momentum2_expectation());
+	properties.push_back(psi_fun.potential_expectation());
+	properties.push_back(psi_fun.hamiltonian_expectation());
+	
+	results.write_property(properties);
+	
+	results.close_files();
 }

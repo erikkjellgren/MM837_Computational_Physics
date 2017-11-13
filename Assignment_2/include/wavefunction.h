@@ -5,7 +5,6 @@
  * ***************************************************************************/
 
 #include<vector>
-#include<iostream>
 using namespace std;
 
 class wavefunction{
@@ -21,9 +20,7 @@ class wavefunction{
 					phisq.push_back(phi[i]*phi[i]);
 				}
 				
-				
-				norm = simpsons_rule(phisq, integration_step_size);
-				cout << "norm = " << norm << endl;	
+				norm = simpsons_rule(phisq, integration_step_size);	
 				for (int i=0; i<phi.size(); i++){
 					phi[i] /= sqrt(norm);
 					delta_phi[i] /= sqrt(norm);
@@ -34,6 +31,15 @@ class wavefunction{
 				}
 				
 			}
+		double return_norm(){
+			return norm;
+		}
+		vector<double> return_wavefunction(){
+			return phi;
+		}
+		vector<double> return_delta_wavefunction(){
+			return delta_phi;
+		}
 	
 		double simpsons_rule(const vector<double>& phi, const double& integration_step_size) { 
 			double output=0.0;

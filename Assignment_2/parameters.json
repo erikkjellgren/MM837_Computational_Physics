@@ -7,7 +7,7 @@
 	"ode_solver_steps": 1000,
 	"potential_parameter_1": 1.0,
 	"potential_parameter_2": 1.0,
-	"potential_type": 1,
+	"potential_type": 3,
 	"delta_energy": 0.2,
 	"x_match_parameter_1": 2.0,
 	"x_match_parameter_2": 20.0,

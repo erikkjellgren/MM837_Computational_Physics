@@ -18,7 +18,15 @@ class Potentials {
 
 		double operator() (const double& q, const double& x) const {
 			double v;
-			if (potential_type == 3){
+			if (potential_type == 1){
+				if (fabs(x)<=k2){v=-k1;}
+				else {v=0.0;}
+			}
+			else if (potential_type == 2){
+				if (fabs(x)<=k2){v=k1/k2*(fabs(x)-k2);}
+				else {v=0.0;}
+			}
+			else if (potential_type == 3){
 				v = k1*x*x; 
 			}
 			else if(potential_type == 4){
@@ -27,7 +35,6 @@ class Potentials {
 			else if(potential_type == 5){
 				v = 0;
 			}
-			
 			return (v-e)*q; 
 		}
 };

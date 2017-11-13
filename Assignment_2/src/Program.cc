@@ -14,9 +14,9 @@ using namespace std;
 using json = nlohmann::json;
 
 int main(int argc, char** argv) {
-	int iteration, iterations_max, x_match, ode_steps_left, ode_steps_right, ode_steps, potential_type;
-	double check, check_old, x_min, x_max, tol, energy, delta_energy, k1, k2;
-	double ode_step_size, q0_left, q0_right, p0_left, p0_right, qn_left, qn_right, pn_left, pn_right;
+	int iteration, iterations_max, x_match, ode_steps_left, ode_steps_right, ode_steps, potential_type, NewtonRapshon;
+	double check, check_old, x_min, x_max, tol, energy, delta_energy, k1, k2, x_match_parameter_1, x_match_parameter_2;
+	double ode_step_size, q0_left, q0_right, p0_left, p0_right, qn_left, qn_right, pn_left, pn_right, delta_check;
 	
 	// Load parameters from file
 	ifstream ifs("parameters.json");
@@ -30,12 +30,15 @@ int main(int argc, char** argv) {
 	k1 = j["potential_parameter_1"];
 	k2 = j["potential_parameter_2"];
 	potential_type = j["potential_type"];
+	delta_energy = j["delta_energy"];
+	x_match_parameter_1 = j["x_match_parameter_1"];
+	x_match_parameter_2 = j["x_match_parameter_2"];
+	NewtonRapshon = j["Enable_Newton_Raphson"];
 	
 	// Set integration/ode parameters
-	delta_energy=0.1*energy; 
 	if ((ode_steps%2)==0)
 		ode_steps++;
-	x_match = ode_steps/2+20;
+	x_match = ode_steps/x_match_parameter_1+x_match_parameter_2;
 	ode_step_size=(x_max-x_min)/double(ode_steps-1);
 	ode_steps_left = x_match+1;
 	ode_steps_right = ode_steps-x_match;
@@ -106,10 +109,17 @@ int main(int argc, char** argv) {
 	
 		check = (pn_right - pn_left)/(fabs(pn_right) + fabs(pn_left));
 		
-		cout <<setprecision(10)<< "energy = "<<energy <<", pn_right = " << pn_right << ", pn_left = "<< pn_left << ", f = "<< check<< endl;
+		cout <<setprecision(10)<< "energy = "<<energy <<", pn_right = " << pn_right << ", pn_left = "<< pn_left << ", f = "<< check<< ", de=" << delta_energy<<endl;
 
 		if (fabs(check) < tol){break;}
-		if (iteration==0){continue;}
+		if (iteration==0){;}
+		else if (NewtonRapshon==1){
+			delta_check = (check - check_old)/delta_energy;
+			if (fabs(delta_check) <= 1e-12){cout << "delta_check = 0, no NewtonRapshon step"<<'\n';}
+			else{
+			delta_energy = -check/delta_check;
+			}
+		}
 		else if (fabs(check_old)<fabs(check)){delta_energy = -0.5*delta_energy;}
 
 		energy += delta_energy; 

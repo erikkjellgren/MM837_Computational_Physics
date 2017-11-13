@@ -1,15 +1,15 @@
 {
 	"a": 1.0,
-	"b": 0.0,
-	"c": 0.0,
+	"b": 1.0,
+	"c": 1.0,
 	"mass": 1.0,
-	"number_particles": 10,
+	"number_particles": 100,
 	"delta": 0.1,
-	"number_steps": 10000000,
+	"number_steps": 1000000,
 	"sample_frequency": 1,
 	"integration_step": 0.01,
-	"equilibration_steps": 10000,
-	"hist_velocity_bins": 1000,
-	"hist_max_velocity": 1.1,
-	"hist_min_velocity": -1.1
+	"equilibration_steps": 100000,
+	"hist_velocity_bins": 10000,
+	"hist_max_velocity": 3.0,
+	"hist_min_velocity": -3.0
 }

@@ -65,7 +65,7 @@ class print_results{
 			fprintf(output_file, "\n");
 		}
 		void write_phi(vector<double> x_value, vector<double> phi, vector<double> delta_phi){
-			for (int i=1; i<phi.size()-1; i++){
+			for (int i=0; i<phi.size(); i++){
 				fprintf(phi_file, "%f", x_value[i]);
 				fprintf(phi_file, ";");
 				fprintf(phi_file, "%f", phi[i]);

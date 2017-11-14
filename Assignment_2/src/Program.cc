@@ -74,15 +74,17 @@ int main() {
 
 		phi[0] = q0_left;
 		delta_phi[0] = p0_left;
+		x_value[0] = x_min;
 
 		phi[ode_steps-1] = q0_right;
-		delta_phi[ode_steps-1] = p0_right; 
+		delta_phi[ode_steps-1] = p0_right;
+		x_value[ode_steps-1] = x_max;
 		for (int n=1; n<ode_steps_left; n++) { 
 			integrator_left(qn_left,pn_left,x_min+(n-1)*ode_step_size);
 			
 			phi[n] = qn_left;
 			delta_phi[n] = pn_left;
-			x_value[n] = x_min+(n-1)*ode_step_size;
+			x_value[n] = x_min+n*ode_step_size;
 			potential_value[n] = potential(qn_left, x_min+(n-1)*ode_step_size);
 		}
 		
@@ -91,14 +93,17 @@ int main() {
 			
 			phi[ode_steps-n-1] = qn_right;
 			delta_phi[ode_steps-n-1] = pn_right;
-			x_value[ode_steps-n-1] = x_max-(n-1)*ode_step_size;
+			x_value[ode_steps-n-1] = x_max-n*ode_step_size;
 			potential_value[ode_steps-n-1] = potential(qn_right, x_max-(n-1)*ode_step_size);
 		}
 		
 		//Normalize the left integration results
-		// such that x_match from left equals
-		// x_match from right
-		for (int n=0; n<ode_steps_left; n++) { 
+		//   such that x_match from left equals
+		//   x_match from right
+		//Range goes to ode_steps_left-1, else
+		//   sign will be flipped on x_match
+		//   hopefully the right soluion
+		for (int n=0; n<ode_steps_left-1; n++) { 
 			phi[n] *= qn_right/qn_left;
 			delta_phi[n] *= qn_right/qn_left;
 		}
@@ -113,9 +118,7 @@ int main() {
 		else if (NewtonRapshon==1){
 			delta_check = (check - check_old)/delta_energy;
 			if (fabs(delta_check) <= 1e-12){results.write_warning(1);}
-			else{
-			delta_energy = -check/delta_check;
-			}
+			else{delta_energy = -check/delta_check;}
 		}
 		else if (fabs(check_old)<fabs(check)){delta_energy = -0.5*delta_energy;}
 

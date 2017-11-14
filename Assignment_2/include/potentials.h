@@ -33,7 +33,7 @@ class Potentials {
 				v = k1*x*x + 2.0*k2*x*x*x*x;
 			}
 			else if(potential_type == 5){
-				v = 0;
+				v = 0.0;
 			}
 			return (v-e)*q; 
 		}

@@ -85,7 +85,7 @@ int main() {
 			phi[n] = qn_left;
 			delta_phi[n] = pn_left;
 			x_value[n] = x_min+n*ode_step_size;
-			potential_value[n] = potential(qn_left, x_min+(n-1)*ode_step_size);
+			potential_value[n] = potential(qn_left, x_min+(n-1)*ode_step_size)+qn_left*energy;
 		}
 		
 		for (int n=1; n<ode_steps_right; n++) { 
@@ -94,7 +94,7 @@ int main() {
 			phi[ode_steps-n-1] = qn_right;
 			delta_phi[ode_steps-n-1] = pn_right;
 			x_value[ode_steps-n-1] = x_max-n*ode_step_size;
-			potential_value[ode_steps-n-1] = potential(qn_right, x_max-(n-1)*ode_step_size);
+			potential_value[ode_steps-n-1] = potential(qn_right, x_max-(n-1)*ode_step_size)+qn_right*energy;
 		}
 		
 		//Normalize the left integration results

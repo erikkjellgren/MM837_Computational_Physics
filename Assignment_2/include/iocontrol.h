@@ -64,13 +64,15 @@ class print_results{
 			fprintf(output_file, "%f", prop_value[6]);
 			fprintf(output_file, "\n");
 		}
-		void write_phi(vector<double> x_value, vector<double> phi, vector<double> delta_phi){
+		void write_phi(vector<double> x_value, vector<double> phi, vector<double> delta_phi, vector<double> potential){
 			for (int i=0; i<phi.size(); i++){
 				fprintf(phi_file, "%f", x_value[i]);
 				fprintf(phi_file, ";");
 				fprintf(phi_file, "%f", phi[i]);
 				fprintf(phi_file, ";");
 				fprintf(phi_file, "%f", delta_phi[i]);
+				fprintf(phi_file, ";");
+				fprintf(phi_file, "%f", potential[i]);
 				fprintf(phi_file, "\n");
 			}
 		}

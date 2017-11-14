@@ -30,7 +30,7 @@ int main() {
 	x_min = j["x_min"];
 	x_max = j["x_max"];
 	energy = j["energy_guess"];
-	tol = j["energy_tolerance"];
+	tol = j["tolerance"];
 	iterations_max = j["max_iterations"];
 	ode_steps = j["ode_solver_steps"];
 	k1 = j["potential_parameter_1"];
@@ -124,14 +124,16 @@ int main() {
 
 		energy += delta_energy; 
 		check_old = check;
-		qn_left=q0_left; pn_left=p0_left;
-		qn_right=q0_right; pn_right=p0_right;
+		qn_left=q0_left; 
+		pn_left=p0_left;
+		qn_right=q0_right; 
+		pn_right=p0_right;
 	}
 
 	if (iteration==iterations_max){results.write_warning(2);}
 	
 	wavefunction psi_fun(phi, delta_phi, x_value, potential_value, ode_step_size);
-	results.write_phi(x_value,psi_fun.return_wavefunction(), psi_fun.return_delta_wavefunction());
+	results.write_phi(x_value,psi_fun.return_wavefunction(), psi_fun.return_delta_wavefunction(),potential_value);
 	
 	properties.push_back(psi_fun.return_norm());
 	properties.push_back(psi_fun.position_expectation());

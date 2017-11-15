@@ -65,7 +65,7 @@ int main() {
 	vector<double> x_value(ode_steps, 0.0);
 	vector<double> potential_value(ode_steps, 0.0);
 	
-	for (int iteration=0 ; iteration< iterations_max; iteration++) { 
+	for (int iteration=0 ; iteration<iterations_max; iteration++) { 
 		Potentials potential(energy, k1, k2, potential_type); 
 		RK4Integrator<Potentials> integrator_left(potential, ode_step_size);
 		integrator_left.setInitialConditions(qn_left,pn_left); 
@@ -85,7 +85,8 @@ int main() {
 			phi[n] = qn_left;
 			delta_phi[n] = pn_left;
 			x_value[n] = x_min+n*ode_step_size;
-			potential_value[n] = potential(qn_left, x_min+(n-1)*ode_step_size)+qn_left*energy;
+			// potential dosen't return the potentiat, but (v-e)*q, thus v = (v-e)*q + e*q, for q=1.0
+			potential_value[n] = potential(1.0, x_min+(n-1)*ode_step_size)+1.0*energy;
 		}
 		
 		for (int n=1; n<ode_steps_right; n++) { 
@@ -94,7 +95,8 @@ int main() {
 			phi[ode_steps-n-1] = qn_right;
 			delta_phi[ode_steps-n-1] = pn_right;
 			x_value[ode_steps-n-1] = x_max-n*ode_step_size;
-			potential_value[ode_steps-n-1] = potential(qn_right, x_max-(n-1)*ode_step_size)+qn_right*energy;
+			// potential dosen't return the potentiat, but (v-e)*q, thus v = (v-e)*q + e*q, for q=1.0
+			potential_value[ode_steps-n-1] = potential(1.0, x_max-(n-1)*ode_step_size)+1.0*energy;
 		}
 		
 		//Normalize the left integration results
@@ -108,7 +110,7 @@ int main() {
 			delta_phi[n] *= qn_right/qn_left;
 		}
 
-		pn_left *= qn_right/qn_left; 
+		pn_left *= qn_right/qn_left;
 		check = (pn_right - pn_left)/(fabs(pn_right) + fabs(pn_left));
 		
 		results.write_iterations(energy, pn_right, pn_left, check, delta_energy);
@@ -128,9 +130,10 @@ int main() {
 		pn_left=p0_left;
 		qn_right=q0_right; 
 		pn_right=p0_right;
+		
+		if (iteration==iterations_max-1){results.write_warning(2);}
 	}
-
-	if (iteration==iterations_max){results.write_warning(2);}
+	
 	
 	wavefunction psi_fun(phi, delta_phi, x_value, potential_value, ode_step_size);
 	results.write_phi(x_value,psi_fun.return_wavefunction(), psi_fun.return_delta_wavefunction(),potential_value);
@@ -141,6 +144,7 @@ int main() {
 	properties.push_back(psi_fun.momentum_expectation());
 	properties.push_back(psi_fun.momentum2_expectation());
 	properties.push_back(psi_fun.potential_expectation());
+	properties.push_back(psi_fun.kinetic_expectation());
 	properties.push_back(psi_fun.hamiltonian_expectation());
 	
 	results.write_property(properties);

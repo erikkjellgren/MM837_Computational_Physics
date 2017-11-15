@@ -109,6 +109,17 @@ class wavefunction{
 			v_expectation = simpsons_rule(phi_v_phi, integration_step_size);
 			return v_expectation;
 		}
+		
+		double kinetic_expectation(){
+			vector<double> phi_delta2_phi;
+			double t_expectation;
+			
+			for (int i=0; i<phi.size(); i++){
+				phi_delta2_phi.push_back(phi[i]*(-delta2_phi[i]));
+			}
+			t_expectation = simpsons_rule(phi_delta2_phi, integration_step_size);
+			return t_expectation;
+		}
 	
 		double hamiltonian_expectation(){
 			vector<double> phi_h_phi;

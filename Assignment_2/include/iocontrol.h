@@ -21,7 +21,7 @@ class print_results{
 			to_please_cpp = to_please_cpp_;
 			output_file = fopen("output.dat","w");
 			phi_file = fopen("phi.dat","w");
-			fprintf(phi_file, "x;phi;delta_phi");
+			fprintf(phi_file, "x;phi;delta_phi;potential");
 			fprintf(phi_file, "\n");
 		}
 		void close_files(){
@@ -60,8 +60,11 @@ class print_results{
 			fprintf(output_file, "<V>: ");
 			fprintf(output_file, "%f", prop_value[5]);
 			fprintf(output_file, "\n");
-			fprintf(output_file, "<H>: ");
+			fprintf(output_file, "<T>: ");
 			fprintf(output_file, "%f", prop_value[6]);
+			fprintf(output_file, "\n");
+			fprintf(output_file, "<H>: ");
+			fprintf(output_file, "%f", prop_value[7]);
 			fprintf(output_file, "\n");
 		}
 		void write_phi(vector<double> x_value, vector<double> phi, vector<double> delta_phi, vector<double> potential){

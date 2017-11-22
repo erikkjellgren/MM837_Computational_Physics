@@ -33,4 +33,9 @@ class print_results{
 			fprintf(output_file, "\n");
 			fprintf(output_file, "\n");
 		}
+		void fatal_error(const int& error_code){
+			if (error_code == 1){fprintf(output_file, "FATAL ERROR: No valid sweeping method was chosen");}
+			// If fatal error close all files
+			close_files();
+		}
 };

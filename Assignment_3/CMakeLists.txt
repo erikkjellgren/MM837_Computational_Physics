@@ -6,7 +6,8 @@ set(CMAKE_CXX_FLAGS "-O2")
 set(SOURCES src/Sweepers.cc
 			src/Program.cc
 			src/ionctrol.cc
-			src/Properties.cc)
+			src/Properties.cc
+			src/Lattice.cc)
 	
 include_directories(include)
 include_directories(external)

@@ -5,5 +5,6 @@
 	"sample_frequency": 10,
 	"sweep_method": 1,
 	"hybrid_typewrite_freqency": 10,
-	"random_seed": 1
+	"random_seed": 1,
+	"beta": 0.5
 }

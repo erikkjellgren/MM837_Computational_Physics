@@ -3,11 +3,11 @@ PROJECT(Assignment_3_Potts_Model CXX)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "-O2")
 
-set(SOURCES src/Sweepers.cc
-			src/Program.cc
-			src/ionctrol.cc
-			src/Properties.cc
-			src/Lattice.cc)
+set(SOURCES scr/Sweepers.cc
+			scr/Program.cc
+			scr/iocontrol.cc
+			scr/Properties.cc
+			scr/Lattice.cc)
 	
 include_directories(include)
 include_directories(external)

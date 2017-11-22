@@ -3,22 +3,26 @@
  * Container for lattice information
  * ***************************************************************************/
 
-#include <vector>
+#include<vector>
 #include<random>
+ 
+using namespace std;
  
 template<class Sweeper>
  class Lattice{
-	const int seed, L, q;
-	int Energy, Delta_Energy;
-	const Sweeper& Sweep;
+	private:
+		const int seed, L, q;
+		int Energy, Delta_Energy;
+		const Sweeper& Sweep;
+		mt19937 gen;
+		uniform_int_distribution<int> uniform_int_random;
+		vector<vector<int>> lattice;
 	public:
 		Lattice(const Sweeper& Sweep_in, const int& seed_in, const int& L_in, const int& q_in) : 
 			Sweep(Sweep_in), seed(seed_in), L(L_in), q(q_in){
-				
-			seed += 1;
 			
 			mt19937 gen(seed);
-			uniform_int_distribution<double> uniform_int_random(1,q);
+			uniform_int_distribution<int> uniform_int_random(1,q);
 			
 			// build lattice
 			vector<vector<int>> lattice(L,vector<int>(L,0));

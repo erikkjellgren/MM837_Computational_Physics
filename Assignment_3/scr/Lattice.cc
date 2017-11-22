@@ -8,14 +8,14 @@
  
 template<class Sweeper>
  class Lattice{
-	 int seed, L, q;
-	 double Energy;
-	 const Sweeper& Sweep;
-	 public:
+	const int seed, L, q;
+	int Energy, Delta_Energy;
+	const Sweeper& Sweep;
+	public:
 		Lattice(const Sweeper& Sweep_in, const int& seed_in, const int& L_in, const int& q_in) : 
 			Sweep(Sweep_in), seed(seed_in), L(L_in), q(q_in){
 				
-			seed = seed + 1;
+			seed += 1;
 			
 			mt19937 gen(seed);
 			uniform_int_distribution<double> uniform_int_random(1,q);
@@ -29,11 +29,13 @@ template<class Sweeper>
 			}
 		}
 			
-		void operator() (){
-			 
+		void do_sweep(){
+			 Sweep(lattice, Delta_Energy);
+			 Energy += Delta_Energy;
 		}
 		
-		double return_energy();
+		double return_energy(){
 			return Energy;
+		}
 	 
  };

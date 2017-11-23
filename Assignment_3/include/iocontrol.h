@@ -2,8 +2,9 @@
  * iocontrol.h
  * Headerfile for ionctrol.cc
  * ***************************************************************************/
-
-
+#ifndef _IOCONTROL_H_
+#define _IOCONTROL_H_
+ 
 #include<fstream>
 #include<string>
 #include"json.hpp"
@@ -19,5 +20,5 @@ class print_results{
 		print_results(const int& to_please_cpp_in);
 		void close_files();
 		void write_input();
-		void fatal_error(const int& error_code);
 };
+#endif

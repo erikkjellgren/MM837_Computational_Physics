@@ -6,10 +6,9 @@
 #include<iostream>
 #include<fstream>
 #include<vector>
-#include "iocontrol.h"
-#include "Sweepers.h"
-#include "Lattice.h"
-#include "json.hpp"
+#include"iocontrol.h"
+#include"Lattice.h"
+#include"json.hpp"
 
 using namespace std;
 using json = nlohmann::json;
@@ -40,31 +39,16 @@ int main(){
 	vector<int> energy_container(simulation_sweeps/sample_frequency, 0);
 	
 	// Initialize lattice and sweeper method
-	Typewriter sweep_func(random_seed, L, q, beta);
-	Lattice<Typewriter> lattice_grid(sweep_func, random_seed+1, L, q);
-	if (sweep_method == 1){
-		Typewriter sweep_func(random_seed, L, q, beta);
-		Lattice<Typewriter> lattice_grid(sweep_func, random_seed+1, L, q);
-	}
-	else if (sweep_method == 2){
-		;
-	}
-	else if (sweep_method == 3){
-		;
-	}
-	else {
-		results.fatal_error(1);
-		exit (EXIT_FAILURE);
-	}
+	Lattice lattice_func(random_seed, L, q, beta, sweep_method);
 
 	for (int i=0; i<thermalization_sweeps; i++){
-		lattice_grid.do_sweep();
+		lattice_func.do_sweep();
 	}
 	
 	for (int i=1; i<simulation_sweeps+1; i++){
-		lattice_grid.do_sweep();
+		lattice_func.do_sweep();
 		if (i%sample_frequency == 0){
-			energy_container[i/sample_frequency] = lattice_grid.return_energy();
+			energy_container[i/sample_frequency] = lattice_func.return_energy();
 		}
 	}
 	

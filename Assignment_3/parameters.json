@@ -2,7 +2,7 @@
 	"L": 2,
 	"q": 2,
 	"thermalization_sweeps": 1,
-	"simulation_sweeps": 1000,
+	"simulation_sweeps": 10,
 	"sample_frequency": 2,
 	"sweep_method": 1,
 	"hybrid_typewrite_freqency": 10,

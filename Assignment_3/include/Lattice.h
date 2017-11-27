@@ -15,7 +15,7 @@ class Lattice{
 	private:
 		const int rng_seed, L, q, sweeping_method;
 		const double beta;
-		int Energy, Delta_Energy, local_energy, Delta_Energy_total, purposal;
+		int Energy, Delta_Energy, local_energy, purposal;
 		double p_accept;
 		typedef mt19937 random_generator;
 		random_generator gen;
@@ -32,6 +32,6 @@ class Lattice{
 		int reverse_delta_function(const int& spin_i, const int& spin_j);
 		void check_purposal(const int& spin_i, const int& spin_j);
 		void print_conf();
-		void calc_energy();
+		void make_purposal(const int& lattice_spin);
  };
 #endif

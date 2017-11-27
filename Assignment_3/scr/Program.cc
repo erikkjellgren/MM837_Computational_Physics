@@ -46,8 +46,6 @@ int main(){
 	}
 	*/
 	for (int i=1; i<simulation_sweeps+1; i++){
-		lattice_func.print_conf();
-		lattice_func.calc_energy();
 		lattice_func.do_sweep();
 		if (i%sample_frequency == 0){
 			energy_container[i/sample_frequency] = lattice_func.return_energy();

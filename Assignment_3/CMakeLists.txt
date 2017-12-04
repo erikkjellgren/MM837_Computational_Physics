@@ -3,7 +3,7 @@ PROJECT(Assignment_3_Potts_Model CXX)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "-O2")
 
-set(CMAKE_CXX_COMPILER /usr/bin/g++)
+set(CMAKE_CXX_COMPILER "g++")
 
 set(SOURCES scr/Program.cc
 			scr/iocontrol.cc

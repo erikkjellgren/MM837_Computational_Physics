@@ -7,6 +7,7 @@
  
 #include<fstream>
 #include<string>
+#include<vector>
 #include"json.hpp"
 
 using namespace std;
@@ -14,11 +15,15 @@ using json = nlohmann::json;
 
 class print_results{
 	private:
-		FILE* output_file;
+		FILE* output_file; 
+		FILE* autocorr_file;
+		FILE* energy_file;
 		int to_please_cpp;
 	public:
 		print_results(const int& to_please_cpp_in);
 		void close_files();
 		void write_input();
+		void write_integrated_autocorr(const vector<double>& autocorr);
+		void write_energy(const vector<int>& energy);
 };
 #endif

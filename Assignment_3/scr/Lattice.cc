@@ -19,6 +19,8 @@ Lattice::Lattice(const int& seed_in, const int& L_in, const int& q_in, const dou
 	uniform_int_lattice(uniform_int_distribution<int>(0,L-1)){
 	gen.seed(rng_seed);
 	
+	number_accepted = 0;
+	number_purposes = 0;
 	p_add_cluster = 1.0 - exp(-1.0*beta);
 	hybrid_counter = 0;
 	
@@ -125,9 +127,11 @@ void Lattice::wolff_cluster(){
 			k_j=neighbors[k].second;
 			
 			if (lattice[k_i][k_j] == q_old){
+				number_purposes += 1;
 				if (uniform_random(gen) < p_add_cluster){
 					lattice[k_i][k_j] == q_new;
 					cluster_buffer.push(make_pair(k_i,k_j));
+					number_accepted += 1;
 				}
 			}
 		}
@@ -136,6 +140,7 @@ void Lattice::wolff_cluster(){
 }
 
 void Lattice::hybrid(){
+	hybrid_counter += 1;
 	if (hybrid_counter%hybrid_typewrite_freqency == 0){Typewriter();}
 	else {wolff_cluster();}
 }
@@ -156,14 +161,21 @@ void Lattice::make_purposal(const int& lattice_spin){
 
 void Lattice::check_purposal(const int& spin_i, const int& spin_j){
 	p_accept = exp(-beta*(double)(Delta_Energy));
+	number_purposes += 1;
 	if (p_accept >= 1.0){
 		lattice[spin_i][spin_j] = purposal;
 		Energy += Delta_Energy;
+		number_accepted += 1;
 	}
 	else if (p_accept > uniform_random(gen)){
 		lattice[spin_i][spin_j] = purposal;
 		Energy += Delta_Energy;
+		number_accepted += 1;
 	}
+}
+
+double Lattice::return_acceptance_ratio(){
+	return (double)(number_accepted)/(double)(number_purposes);
 }
 
 void Lattice::print_conf(){

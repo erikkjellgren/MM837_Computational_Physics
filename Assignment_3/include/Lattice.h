@@ -17,7 +17,7 @@ class Lattice{
 	private:
 		const int rng_seed, L, q, sweeping_method;
 		const double beta;
-		int Energy, Delta_Energy, local_energy, purposal, hybrid_counter, hybrid_typewrite_freqency;
+		int Energy, Delta_Energy, local_energy, purposal, hybrid_counter, hybrid_typewrite_freqency, number_accepted, number_purposes;
 		double p_accept, p_add_cluster;
 		typedef mt19937 random_generator;
 		random_generator gen;
@@ -38,5 +38,6 @@ class Lattice{
 		void make_purposal(const int& lattice_spin);
 		void wolff_cluster();
 		void hybrid();
+		double return_acceptance_ratio();
  };
 #endif

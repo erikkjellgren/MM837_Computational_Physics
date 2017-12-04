@@ -1,12 +1,12 @@
 {
-	"L": 16,
+	"L": 20,
 	"q": 2,
 	"thermalization_sweeps": 10000,
-	"simulation_sweeps": 100000,
-	"sample_frequency": 10,
+	"simulation_sweeps": 1000000,
+	"sample_frequency": 1,
 	"sweep_method": 1,
 	"hybrid_typewrite_freqency": 10,
-	"random_seed": 2,
-	"simulate_crital_temperaure": 1,
-	"beta": 0.1
+	"random_seed": 1,
+	"simulate_crital_temperaure": 0,
+	"beta": 0.84
 }

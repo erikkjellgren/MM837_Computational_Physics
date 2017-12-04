@@ -15,7 +15,8 @@ using json = nlohmann::json;
 
 class print_results{
 	private:
-		FILE* output_file; 
+		FILE* output_file;
+		FILE* int_autocorr_file;
 		FILE* autocorr_file;
 		FILE* energy_file;
 		int to_please_cpp;
@@ -24,6 +25,8 @@ class print_results{
 		void close_files();
 		void write_input();
 		void write_integrated_autocorr(const vector<double>& autocorr);
-		void write_energy(const vector<int>& energy);
+		void write_autocorr(const vector<double>& autocorr);
+		void write_energy(const vector<double>& energy);
+		void write_acceptance_ratio(const double& acceptance);
 };
 #endif

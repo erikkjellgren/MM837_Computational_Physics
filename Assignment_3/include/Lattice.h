@@ -39,5 +39,6 @@ class Lattice{
 		void wolff_cluster();
 		void hybrid();
 		double return_acceptance_ratio();
+		double return_magnetization();
  };
 #endif

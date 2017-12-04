@@ -7,9 +7,15 @@ def plot_energy():
     plt.show()
 
 def plot_integrated_autocorr():
+    data = np.genfromtxt("int_autocorr.dat")
+    plt.plot(data)
+    plt.show()
+    
+def plot_autocorr():
     data = np.genfromtxt("autocorr.dat")
     plt.plot(data)
     plt.show()
     
 #plot_energy()
-plot_integrated_autocorr()
+#plot_integrated_autocorr()
+plot_autocorr()

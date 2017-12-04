@@ -17,6 +17,8 @@ files
 rapidcheck/
 output2.700000.txt
 output3.100000.txt
+autoc*
+*.rho
 
 # From running scripts
 *.dat

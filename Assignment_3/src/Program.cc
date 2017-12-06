@@ -37,15 +37,14 @@ int main(){
 	initial_lattice = j["initial_lattice"];
 	replications = j["replications"];
 	
+	if (check_critial_T == 1){beta = log(1+sqrt((double)(q)));}
+	
 	#pragma omp parallel for
 	for (int run_ID=0; run_ID<replications; run_ID++){
 		// Initialize iocontrol
 		print_results results(run_ID);
 		results.write_input();
-		
 		random_seed += run_ID;
-		
-		if (check_critial_T == 1){beta = log(1+sqrt((double)(q)));}
 		
 		// Make container for energies
 		vector<double> energy_container(simulation_sweeps/sample_frequency, 0);

@@ -21,6 +21,7 @@ class Lattice{
 		typedef mt19937 random_generator;
 		random_generator gen;
 		uniform_int_distribution<int> uniform_int_random;
+		uniform_int_distribution<int> uniform_int_random_modified;
 		uniform_int_distribution<int> uniform_int_lattice;
 		uniform_real_distribution<double> uniform_random;
 		vector<vector<int>> lattice;

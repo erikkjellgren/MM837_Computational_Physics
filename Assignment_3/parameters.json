@@ -1,9 +1,9 @@
 {
-	"L": 20,
+	"L": 200,
 	"q": 2,
-	"replications": 20,
-	"thermalization_sweeps": 10000,
-	"simulation_sweeps": 100000,
+	"replications": 1,
+	"thermalization_sweeps": 1000,
+	"simulation_sweeps": 1000,
 	"sample_frequency": 1,
 	"sweep_method": 1,
 	"hybrid_typewrite_freqency": 10,

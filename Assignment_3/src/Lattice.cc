@@ -14,7 +14,7 @@ using namespace std;
 Lattice::Lattice(const int& seed_in, const int& L_in, const int& q_in, const double& beta_in, const int& sweeping_method_in, const int& hybrid_typewrite_freqency_in, const int& initial_lattice_in) : 
 	rng_seed(seed_in), L(L_in), q(q_in), beta(beta_in), sweeping_method(sweeping_method_in), p_add_cluster(1.0 - exp(-1.0*beta_in)), 
 	hybrid_typewrite_freqency(hybrid_typewrite_freqency_in), uniform_random(uniform_real_distribution<double>(0,1)), uniform_int_random(uniform_int_distribution<int>(1,q)),
-	uniform_int_lattice(uniform_int_distribution<int>(0,L-1)), initial_lattice(initial_lattice_in), 
+	uniform_int_lattice(uniform_int_distribution<int>(0,L-1)), initial_lattice(initial_lattice_in), uniform_int_random_modified(uniform_int_distribution<int>(1,q-1)),
 	p_accept_vector{exp(-beta*(double)(0)),exp(-beta*(double)(1)),exp(-beta*(double)(2)),exp(-beta*(double)(3)),exp(-beta*(double)(4))}{
 	gen.seed(rng_seed);
 	
@@ -58,7 +58,7 @@ double Lattice::return_energy(){
 }
 
 void Lattice::Typewriter(){
-	int i_up, i_down, j_left, j_right, purposal, local_energy, Delta_Energy;
+	int i_up, i_down, j_left, j_right, q_old, q_new, Delta_Energy;
 	
 	number_purposes += L*L;
 	for (int i=0; i<L; i++){
@@ -69,17 +69,17 @@ void Lattice::Typewriter(){
 			if (j == 0){j_left = L-1; j_right = j+1;}
 			else if (j == L-1){j_left = j-1; j_right = 0;}
 			else{j_left = j-1; j_right = j+1;}
-			local_energy = reverse_delta_function(lattice[i][j],lattice[i][j_left])
-						+ reverse_delta_function(lattice[i][j],lattice[i][j_right])
-						+ reverse_delta_function(lattice[i][j],lattice[i_up][j])
-						+ reverse_delta_function(lattice[i][j],lattice[i_down][j]);
-			purposal = make_purposal(lattice[i][j]);
-			Delta_Energy = reverse_delta_function(purposal,lattice[i][j_left])
-						+ reverse_delta_function(purposal,lattice[i][j_right])
-						+ reverse_delta_function(purposal,lattice[i_up][j])
-						+ reverse_delta_function(purposal,lattice[i_down][j])
-						- local_energy;
-			check_purposal(i, j, purposal, Delta_Energy);
+			q_old = lattice[i][j];
+			q_new = make_purposal(q_old);
+			Delta_Energy = reverse_delta_function(q_new,lattice[i][j_left])
+						+ reverse_delta_function(q_new,lattice[i][j_right])
+						+ reverse_delta_function(q_new,lattice[i_up][j])
+						+ reverse_delta_function(q_new,lattice[i_down][j])
+						- reverse_delta_function(q_old,lattice[i][j_left])
+						- reverse_delta_function(q_old,lattice[i][j_right])
+						- reverse_delta_function(q_old,lattice[i_up][j])
+						- reverse_delta_function(q_old,lattice[i_down][j]);
+			check_purposal(i, j, q_new, Delta_Energy);
 		}
 	}
 }
@@ -88,11 +88,13 @@ void Lattice::wolff_cluster(){
 	int i_up, i_down, j_left, j_right, i_start, j_start, i, j, k_i, k_j;
 	stack<pair<int,int>> cluster_buffer;
 	pair<int,int> cur_site;
-	const int q_old = lattice[i_start][j_start];
-	const int q_new = make_purposal(q_old);
 	
 	i_start = uniform_int_lattice(gen);
 	j_start = uniform_int_lattice(gen);
+	
+	const int q_old = lattice[i_start][j_start];
+	const int q_new = make_purposal(q_old);
+	
 	number_purposes += L*L;
 	number_accepted += 1;
 	
@@ -114,6 +116,7 @@ void Lattice::wolff_cluster(){
 		if (j == 0){j_left = L-1; j_right = j+1;}
 		else if (j == L-1){j_left = j-1; j_right = 0;}
 		else{j_left = j-1; j_right = j+1;}
+		
 		neighbors.push_back(make_pair(i_up,j));
 		neighbors.push_back(make_pair(i_down,j));
 		neighbors.push_back(make_pair(i,j_left));
@@ -132,7 +135,6 @@ void Lattice::wolff_cluster(){
 			}
 		}
 	}
-	
 }
 
 void Lattice::hybrid(){
@@ -143,16 +145,16 @@ void Lattice::hybrid(){
 
 int Lattice::reverse_delta_function(const int& spin_i, const int& spin_j){
 	int output;
-	if (spin_i == spin_j){output=0;}
-	else {output=1;}
+	if (spin_i == spin_j){output = 0;}
+	else {output = 1;}
 	return output;
 }
 
 int Lattice::make_purposal(const int& lattice_spin){
 	int purposal;
-	purposal = uniform_int_random(gen);
-	while (lattice_spin == purposal){
-		purposal = uniform_int_random(gen);
+	purposal = uniform_int_random_modified(gen);
+	if (lattice_spin == purposal){
+		purposal = q;
 	}
 	return purposal;
 }

@@ -9,10 +9,10 @@ if (OPENMP_FOUND)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-set(SOURCES scr/Program.cc
-			scr/iocontrol.cc
-			scr/Properties.cc
-			scr/Lattice.cc)
+set(SOURCES src/Program.cc
+			src/iocontrol.cc
+			src/Properties.cc
+			src/Lattice.cc)
 	
 include_directories(include)
 include_directories(external)

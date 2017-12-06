@@ -12,12 +12,12 @@
 using namespace std;
 using json = nlohmann::json;
 
-print_results::print_results(const int& to_please_cpp_in) :
-	to_please_cpp(to_please_cpp_in){
-	output_file = fopen("output.dat","w");
-	int_autocorr_file = fopen("int_autocorr.dat","w");
-	autocorr_file = fopen("autocorr.dat","w");
-	energy_file = fopen("energy.dat","w");
+print_results::print_results(const int& run_ID_in) :
+	run_ID(run_ID_in){
+	output_file = fopen(("output_"+to_string(run_ID)+".dat").c_str(),"w");
+	int_autocorr_file = fopen(("int_autocorr_"+to_string(run_ID)+".dat").c_str(),"w");
+	autocorr_file = fopen(("autocorr_"+to_string(run_ID)+".dat").c_str(),"w");
+	energy_file = fopen(("energy_"+to_string(run_ID)+".dat").c_str(),"w");
 }
 
 void print_results::close_files(){
@@ -36,6 +36,12 @@ void print_results::write_input(){
 	fprintf(output_file, "Inputfile:");
 	fprintf(output_file, "\n");
 	fprintf(output_file, "%s", s.c_str());
+	fprintf(output_file, "\n");
+	fprintf(output_file, "\n");
+	fprintf(output_file, "run_ID: ");
+	fprintf(output_file, "%i", run_ID);
+	fprintf(output_file, "\n");
+	fprintf(output_file, "Actual random_seed = random_seed + run_ID");
 	fprintf(output_file, "\n");
 	fprintf(output_file, "\n");
 }

@@ -19,9 +19,9 @@ class print_results{
 		FILE* int_autocorr_file;
 		FILE* autocorr_file;
 		FILE* energy_file;
-		const int to_please_cpp;
+		const int run_ID;
 	public:
-		print_results(const int& to_please_cpp_in);
+		print_results(const int& run_ID_in);
 		void close_files();
 		void write_input();
 		void write_integrated_autocorr(const vector<double>& autocorr);

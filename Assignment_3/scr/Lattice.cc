@@ -11,10 +11,10 @@
  
 using namespace std;
 
-Lattice::Lattice(const int& seed_in, const int& L_in, const int& q_in, const double& beta_in, const int& sweeping_method_in, const int& hybrid_typewrite_freqency_in) : 
+Lattice::Lattice(const int& seed_in, const int& L_in, const int& q_in, const double& beta_in, const int& sweeping_method_in, const int& hybrid_typewrite_freqency_in, const int& initial_lattice_in) : 
 	rng_seed(seed_in), L(L_in), q(q_in), beta(beta_in), sweeping_method(sweeping_method_in), p_add_cluster(1.0 - exp(-1.0*beta_in)), 
 	hybrid_typewrite_freqency(hybrid_typewrite_freqency_in), uniform_random(uniform_real_distribution<double>(0,1)), uniform_int_random(uniform_int_distribution<int>(1,q)),
-	uniform_int_lattice(uniform_int_distribution<int>(0,L-1)), 
+	uniform_int_lattice(uniform_int_distribution<int>(0,L-1)), initial_lattice(initial_lattice_in), 
 	p_accept_vector{exp(-beta*(double)(0)),exp(-beta*(double)(1)),exp(-beta*(double)(2)),exp(-beta*(double)(3)),exp(-beta*(double)(4))}{
 	gen.seed(rng_seed);
 	
@@ -29,7 +29,8 @@ Lattice::Lattice(const int& seed_in, const int& L_in, const int& q_in, const dou
 	for (int i=0; i<L; i++){
 		lattice.push_back(vector<int>());
 		for (int j=0; j<L; j++){
-			lattice[i].push_back(uniform_int_random(gen));
+			if (initial_lattice == 1){lattice[i].push_back(uniform_int_random(gen));}
+			else {lattice[i].push_back(1);}
 		}
 	}
 }

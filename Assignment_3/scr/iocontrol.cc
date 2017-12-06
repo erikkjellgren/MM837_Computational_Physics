@@ -12,8 +12,8 @@
 using namespace std;
 using json = nlohmann::json;
 
-print_results::print_results(const int& to_please_cpp_in){
-	to_please_cpp = to_please_cpp_in;
+print_results::print_results(const int& to_please_cpp_in) :
+	to_please_cpp(to_please_cpp_in){
 	output_file = fopen("output.dat","w");
 	int_autocorr_file = fopen("int_autocorr.dat","w");
 	autocorr_file = fopen("autocorr.dat","w");

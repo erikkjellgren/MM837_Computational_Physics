@@ -19,7 +19,7 @@ class print_results{
 		FILE* int_autocorr_file;
 		FILE* autocorr_file;
 		FILE* energy_file;
-		int to_please_cpp;
+		const int to_please_cpp;
 	public:
 		print_results(const int& to_please_cpp_in);
 		void close_files();

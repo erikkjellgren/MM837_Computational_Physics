@@ -15,16 +15,16 @@ using namespace std;
 
 class Lattice{
 	private:
-		const int rng_seed, L, q, sweeping_method;
-		const double beta;
-		int Energy, Delta_Energy, local_energy, purposal, hybrid_counter, hybrid_typewrite_freqency, number_accepted, number_purposes;
-		double p_accept, p_add_cluster;
+		const int rng_seed, L, q, sweeping_method, hybrid_typewrite_freqency;
+		const double beta, p_add_cluster;
+		long int hybrid_counter, number_accepted, number_purposes;
 		typedef mt19937 random_generator;
 		random_generator gen;
 		uniform_int_distribution<int> uniform_int_random;
 		uniform_int_distribution<int> uniform_int_lattice;
 		uniform_real_distribution<double> uniform_random;
 		vector<vector<int>> lattice;
+		const vector<double> p_accept_vector;
 		typedef void (Lattice::*fptr)();
 		fptr Sweep;
 	public:
@@ -33,9 +33,9 @@ class Lattice{
 		double return_energy(); 
 		void Typewriter();
 		int reverse_delta_function(const int& spin_i, const int& spin_j);
-		void check_purposal(const int& spin_i, const int& spin_j);
+		void check_purposal(const int& spin_i, const int& spin_j, const int& purposal, const int& Delta_Energy);
 		void print_conf();
-		void make_purposal(const int& lattice_spin);
+		int make_purposal(const int& lattice_spin);
 		void wolff_cluster();
 		void hybrid();
 		double return_acceptance_ratio();

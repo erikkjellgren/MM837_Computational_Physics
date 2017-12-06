@@ -16,7 +16,7 @@ using json = nlohmann::json;
 
 int main(){
 	int L, q, thermalization_sweeps, simulation_sweeps, sample_frequency,
-		sweep_method, hybrid_typewrite_freqency, random_seed, check_critial_T;
+		sweep_method, hybrid_typewrite_freqency, random_seed, check_critial_T, autocorrelation_cut;
 	double beta, acceptance_ratio;
 	
 	// Initialize iocontrol
@@ -36,6 +36,7 @@ int main(){
 	random_seed = j["random_seed"];
 	beta = j["beta"];
 	check_critial_T = j["simulate_crital_temperaure"];
+	autocorrelation_cut = j["autocorrelation_cut"];
 	
 	if (check_critial_T == 1){beta = log(1+sqrt((double)(q)));}
 	
@@ -59,15 +60,12 @@ int main(){
 	
 	results.write_acceptance_ratio(lattice_func.return_acceptance_ratio());
 	// Calculate properties
-	/*
-	properties property_func(energy_container);
-	property_func.calc_autocovariance();
+	properties property_func(energy_container, autocorrelation_cut);
 	property_func.calc_autocorrelation();
 	property_func.calc_integrated_autocorr();
-	*/
 	results.write_energy(energy_container);
-	//results.write_integrated_autocorr(property_func.return_integrated_autocorr());
-	//results.write_autocorr(property_func.return_autocorr());
+	results.write_integrated_autocorr(property_func.return_integrated_autocorr());
+	results.write_autocorr(property_func.return_autocorr());
 	
 	// Finalize IO
 	results.close_files();

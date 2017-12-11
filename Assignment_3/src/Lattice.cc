@@ -150,7 +150,7 @@ void Lattice::wolff_cluster(){
 
 void Lattice::hybrid(){
 	hybrid_counter += 1;
-	if (hybrid_counter%hybrid_typewrite_freqency == 0){Typewriter();}
+	if (hybrid_counter%(hybrid_typewrite_freqency+1) == 0){Typewriter();}
 	else {wolff_cluster();}
 }
 

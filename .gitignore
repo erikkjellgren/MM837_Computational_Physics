@@ -19,6 +19,7 @@ output2.700000.txt
 output3.100000.txt
 autoc*
 *.rho
+hybrid_*
 
 # From running scripts
 *.dat

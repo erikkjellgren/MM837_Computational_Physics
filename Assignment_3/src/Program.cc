@@ -39,7 +39,7 @@ int main(){
 	
 	if (check_critial_T == 1){beta = log(1+sqrt((double)(q)));}
 	
-	#pragma omp parallel for
+	#pragma omp parallel for schedule(dynamic)
 	for (int run_ID=0; run_ID<replications; run_ID++){
 		// Initialize iocontrol
 		print_results results(run_ID);

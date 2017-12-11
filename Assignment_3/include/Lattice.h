@@ -34,9 +34,9 @@ class Lattice{
 		double return_energy(); 
 		void Typewriter();
 		int reverse_delta_function(const int& spin_i, const int& spin_j);
-		void check_purposal(const int& spin_i, const int& spin_j, const int& purposal, const int& Delta_Energy);
+		void check_proposal(const int& spin_i, const int& spin_j, const int& proposal, const int& Delta_Energy);
 		void print_conf();
-		int make_purposal(const int& lattice_spin);
+		int make_proposal(const int& lattice_spin);
 		void wolff_cluster();
 		void hybrid();
 		double return_acceptance_ratio();

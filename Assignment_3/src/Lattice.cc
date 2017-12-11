@@ -11,28 +11,39 @@
  
 using namespace std;
 
-Lattice::Lattice(const int& seed_in, const int& L_in, const int& q_in, const double& beta_in, const int& sweeping_method_in, const int& hybrid_typewrite_freqency_in, const int& initial_lattice_in) : 
-	rng_seed(seed_in), L(L_in), q(q_in), beta(beta_in), sweeping_method(sweeping_method_in), p_add_cluster(1.0 - exp(-1.0*beta_in)), 
-	hybrid_typewrite_freqency(hybrid_typewrite_freqency_in), uniform_random(uniform_real_distribution<double>(0,1)), uniform_int_random(uniform_int_distribution<int>(1,q)),
-	uniform_int_lattice(uniform_int_distribution<int>(0,L-1)), initial_lattice(initial_lattice_in), uniform_int_random_modified(uniform_int_distribution<int>(1,q-1)),
-	p_accept_vector{exp(-beta*(double)(0)),exp(-beta*(double)(1)),exp(-beta*(double)(2)),exp(-beta*(double)(3)),exp(-beta*(double)(4))}{
-	gen.seed(rng_seed);
-	
-	number_accepted = 0;
-	number_purposes = 0;
-	hybrid_counter = 0;
-	
-	if (sweeping_method == 1){Sweep = &Lattice::Typewriter;}
-	else if (sweeping_method == 2){Sweep = &Lattice::wolff_cluster;}
-	else if (sweeping_method == 3){Sweep = &Lattice::hybrid;}
-	
-	for (int i=0; i<L; i++){
-		lattice.push_back(vector<int>());
-		for (int j=0; j<L; j++){
-			if (initial_lattice == 1){lattice[i].push_back(uniform_int_random(gen));}
-			else {lattice[i].push_back(1);}
+Lattice::Lattice(const int& seed_in, const int& L_in, const int& q_in, const double& beta_in, const int& sweeping_method_in, 
+				 const int& hybrid_typewrite_freqency_in, const int& initial_lattice_in) : 
+	rng_seed(seed_in), 
+	L(L_in), 
+	q(q_in), 
+	beta(beta_in), 
+	sweeping_method(sweeping_method_in), 
+	p_add_cluster(1.0 - exp(-1.0*beta_in)), 
+	hybrid_typewrite_freqency(hybrid_typewrite_freqency_in), 
+	uniform_random(uniform_real_distribution<double>(0,1)), 
+	uniform_int_random(uniform_int_distribution<int>(1,q_in)),
+	uniform_int_lattice(uniform_int_distribution<int>(0,L_in-1)), 
+	initial_lattice(initial_lattice_in), 
+	uniform_int_random_modified(uniform_int_distribution<int>(1,q_in-1)),
+	p_accept_vector{exp(-beta_in*(double)(0)), exp(-beta_in*(double)(1)), exp(-beta_in*(double)(2)), exp(-beta_in*(double)(3)), exp(-beta_in*(double)(4))}
+	{
+		gen.seed(rng_seed);
+		
+		number_accepted = 0;
+		number_purposes = 0;
+		hybrid_counter = 0;
+		
+		if (sweeping_method == 1){Sweep = &Lattice::Typewriter;}
+		else if (sweeping_method == 2){Sweep = &Lattice::wolff_cluster;}
+		else if (sweeping_method == 3){Sweep = &Lattice::hybrid;}
+		
+		for (int i=0; i<L; i++){
+			lattice.push_back(vector<int>());
+			for (int j=0; j<L; j++){
+				if (initial_lattice == 1){lattice[i].push_back(uniform_int_random(gen));}
+				else {lattice[i].push_back(1);}
+			}
 		}
-	}
 }
 
 void Lattice::do_sweep(){
@@ -41,15 +52,15 @@ void Lattice::do_sweep(){
 
 double Lattice::return_energy(){
 		double Energy = 0.0;
-		int i_up, i_down, j_left, j_right;
+		int i_down, j_right;
 		for (int i=0; i<L; i++){
 			for (int j=0; j<L; j++){
-				if (i == 0){i_up = L-1; i_down = i+1;}
-				else if (i == L-1){i_up = i-1; i_down = 0;}
-				else{i_up = i-1; i_down = i+1;}
-				if (j == 0){j_left = L-1; j_right = j+1;}
-				else if (j == L-1){j_left = j-1; j_right = 0;}
-				else{j_left = j-1; j_right = j+1;}
+				if (i == 0){i_down = i+1;}
+				else if (i == L-1){i_down = 0;}
+				else{i_down = i+1;}
+				if (j == 0){j_right = j+1;}
+				else if (j == L-1){j_right = 0;}
+				else{j_right = j+1;}
 				Energy += reverse_delta_function(lattice[i][j],lattice[i][j_right])
 						+ reverse_delta_function(lattice[i][j],lattice[i_down][j]);
 			}
@@ -70,7 +81,7 @@ void Lattice::Typewriter(){
 			else if (j == L-1){j_left = j-1; j_right = 0;}
 			else{j_left = j-1; j_right = j+1;}
 			q_old = lattice[i][j];
-			q_new = make_purposal(q_old);
+			q_new = make_proposal(q_old);
 			Delta_Energy = reverse_delta_function(q_new,lattice[i][j_left])
 						+ reverse_delta_function(q_new,lattice[i][j_right])
 						+ reverse_delta_function(q_new,lattice[i_up][j])
@@ -79,7 +90,7 @@ void Lattice::Typewriter(){
 						- reverse_delta_function(q_old,lattice[i][j_right])
 						- reverse_delta_function(q_old,lattice[i_up][j])
 						- reverse_delta_function(q_old,lattice[i_down][j]);
-			check_purposal(i, j, q_new, Delta_Energy);
+			check_proposal(i, j, q_new, Delta_Energy);
 		}
 	}
 }
@@ -93,7 +104,7 @@ void Lattice::wolff_cluster(){
 	j_start = uniform_int_lattice(gen);
 	
 	const int q_old = lattice[i_start][j_start];
-	const int q_new = make_purposal(q_old);
+	const int q_new = make_proposal(q_old);
 	
 	number_purposes += L*L;
 	number_accepted += 1;
@@ -150,22 +161,22 @@ int Lattice::reverse_delta_function(const int& spin_i, const int& spin_j){
 	return output;
 }
 
-int Lattice::make_purposal(const int& lattice_spin){
-	int purposal;
-	purposal = uniform_int_random_modified(gen);
-	if (lattice_spin == purposal){
-		purposal = q;
+int Lattice::make_proposal(const int& lattice_spin){
+	int proposal;
+	proposal = uniform_int_random_modified(gen);
+	if (lattice_spin == proposal){
+		proposal = q;
 	}
-	return purposal;
+	return proposal;
 }
 
-void Lattice::check_purposal(const int& spin_i, const int& spin_j, const int& purposal, const int& Delta_Energy){
+void Lattice::check_proposal(const int& spin_i, const int& spin_j, const int& proposal, const int& Delta_Energy){
 	if (Delta_Energy <= 0.0){
-		lattice[spin_i][spin_j] = purposal;
+		lattice[spin_i][spin_j] = proposal;
 		number_accepted += 1;
 	}
 	else if (p_accept_vector[Delta_Energy] > uniform_random(gen)){
-		lattice[spin_i][spin_j] = purposal;
+		lattice[spin_i][spin_j] = proposal;
 		number_accepted += 1;
 	}
 }

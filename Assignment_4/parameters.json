@@ -1,15 +1,11 @@
 {
 	"L": 10,
-	"q": 20,
 	"replications": 1,
 	"thermalization_sweeps": 1000000,
 	"simulation_sweeps": 100,
 	"sample_frequency": 1,
 	"sweep_method": 3,
-	"hybrid_typewrite_freqency": 5,
-	"random_seed": 2,
-	"autocorrelation_cut": 1000,
+	"random_seed": 1,
 	"initial_lattice": 1,
-	"simulate_crital_temperaure": 0,
 	"beta": 10
 }

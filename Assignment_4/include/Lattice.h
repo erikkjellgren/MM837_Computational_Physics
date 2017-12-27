@@ -26,6 +26,7 @@ class Lattice{
 		uniform_real_distribution<double> uniform_real_x;
 		uniform_int_distribution<int> get_sign;
 		vector<vector<double>> lattice;
+		vector<double> two_point_corr_vector;
 		typedef void (Lattice::*fptr)();
 		fptr Sweep;
 	public:
@@ -38,5 +39,7 @@ class Lattice{
 		double return_energy();
 		double return_acceptance_ratio();
 		vector<vector<double>> return_lattice();
+		void two_point_corr();
+		vector<double> return_two_point_corr();
 };
 #endif

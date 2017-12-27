@@ -19,6 +19,7 @@ print_results::print_results(const int& run_ID_in, const int& L_in) :
 	autocorr_file = fopen(("autocorr_"+to_string(run_ID)+".dat").c_str(),"w");
 	energy_file = fopen(("energy_"+to_string(run_ID)+".dat").c_str(),"w");
 	lattice_file = fopen(("lattice_"+to_string(run_ID)+".dat").c_str(),"w");
+	two_point_corr_file = fopen(("two_point_corr_"+to_string(run_ID)+".dat").c_str(),"w");
 }
 
 void print_results::close_files(){
@@ -82,5 +83,12 @@ void print_results::write_lattice(const vector<vector<double>>& lattice){
 			fprintf(lattice_file, " ");
 		}
 		fprintf(lattice_file, "\n");
+	}
+}
+
+void print_results::write_two_point_corr(const vector<double>& two_point_vec){
+	for (int i=0; i<two_point_vec.size(); i++){
+		fprintf(two_point_corr_file, "%f", two_point_vec[i]);
+		fprintf(two_point_corr_file, "\n");
 	}
 }

@@ -28,30 +28,15 @@ def plot_autocorr(samples):
         plt.plot(data, '-', linewidth=.5, alpha=.2)
     plt.plot(data2/samples, 'b-', linewidth=3)
     plt.show()
-
-def animate_lattice():
-    L = 20
     
-    plt.ion()
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    data = np.genfromtxt("lattice_0.dat")
-    x = np.cos(data[0:L,:])
-    y = np.sin(data[0:L,:])
-    m = ax.matshow(data[0:L,:], vmin=-np.pi, vmax=np.pi, cmap=plt.cm.hsv)
-    q = ax.quiver(x,y)
-    #plt.colorbar()
-    
-    for j in range(1, int(len(data)/L)):
-        data_new = data[j*L:(j+1)*L,:]
-        x = np.cos(data_new)
-        y = np.sin(data_new)
-        m.set_data(data_new)
-        q.U = x.flat[:]
-        q.V = y.flat[:]
-        plt.pause(0.00001)
+def plot_two_point_corr():
+    data = np.genfromtxt("two_point_corr_0.dat")
+    plt.plot(data)
+    plt.show()
 
-plot_energy()
-#plot_autocorr(1)
-#plot_integrated_autocorr(1)
+
+#plot_energy()
+#plot_two_point_corr()
+#plot_autocorr(4)
+plot_integrated_autocorr(4)
 #animate_lattice()

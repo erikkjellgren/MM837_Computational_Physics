@@ -40,6 +40,10 @@ Lattice::Lattice(const int& seed_in, const int& L_in, const double& beta_in, con
 				lattice[i].push_back(0.0);
 			}
 		}
+		
+		for (int i=0; i<L/2; i++){
+			two_point_corr_vector.push_back(0.0);
+		}
 }
 
 
@@ -249,4 +253,61 @@ double Lattice::return_acceptance_ratio(){
 
 vector<vector<double>> Lattice::return_lattice(){
 	return lattice;
+}
+
+
+void Lattice::two_point_corr(){
+	int j_new, i_new;
+	int counter = 0;
+	double e;
+	double e_x=0.0;
+	double e_y=0.0;
+
+	vector<double> two_point_corr_vector_temp;
+	for (int i=0; i<L/2; i++){
+		two_point_corr_vector_temp.push_back(0.0);
+	}
+	
+	for (int i=0; i<L; i++){
+		for (int j=0; j<L; j++){
+			e_x += cos(lattice[i][j]);
+			e_y += sin(lattice[i][j]);
+		}
+	}
+	
+	e_x /= (double)(L*L);
+	e_y /= (double)(L*L);
+	e = e_x*e_x + e_y*e_y;
+	
+	for (int i=0; i<L; i++){
+		for (int j=0; j<L; j++){
+			counter += 2;
+			e_x = cos(lattice[i][j]);
+			e_y = sin(lattice[i][j]);
+			for (int k=1; k<L/2; k++){
+				if (i+k > L-1){i_new = i+k - L;}
+				else {i_new = i+k;}
+				two_point_corr_vector_temp[k] += e_x*cos(lattice[i_new][j]) + e_y*sin(lattice[i_new][j]);
+			}
+			for (int k=1; k<L/2; k++){
+				if (j+k > L-1){j_new = j+k - L;}
+				else {j_new = j+k;}
+				two_point_corr_vector_temp[k] += e_x*cos(lattice[i][j_new]) + e_y*sin(lattice[i][j_new]);
+			}
+		}
+	}
+	
+	for (int i=0; i<L/2; i++){
+		two_point_corr_vector[i] += two_point_corr_vector_temp[i]/(double)(counter) - e;
+	}
+}
+
+vector<double> Lattice::return_two_point_corr(){
+	vector<double> two_point_corr_vector_temp;
+	double norm;
+	norm = two_point_corr_vector[1];
+	for (int i=1; i<L/2; i++){
+		two_point_corr_vector_temp.push_back(two_point_corr_vector[i]/norm);
+	}
+	return two_point_corr_vector_temp;
 }

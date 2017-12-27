@@ -41,7 +41,7 @@ void properties::calc_autocorrelation(){
 void properties::calc_integrated_autocorr(){
 	// Heavily based on Physics/Scientific Computing by Konstantinos Anagnostopoulos
 	for (int tcut=0; tcut<tmax; tcut++){
-		integrated_autocorr.push_back(0.0);
+		integrated_autocorr.push_back(0.5);
 		for (int t=0; t<=tcut; t++){
 			integrated_autocorr[tcut] += autocorrelation[t];
 		}

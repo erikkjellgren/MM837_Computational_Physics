@@ -20,6 +20,7 @@ class print_results{
 		FILE* autocorr_file;
 		FILE* energy_file;
 		FILE* lattice_file;
+		FILE* two_point_corr_file;
 		const int run_ID, L;
 	public:
 		print_results(const int& run_ID_in, const int& L_in);
@@ -30,5 +31,6 @@ class print_results{
 		void write_energy(const vector<double>& energy);
 		void write_acceptance_ratio(const double& acceptance);
 		void write_lattice(const vector<vector<double>>& lattice);
+		void write_two_point_corr(const vector<double>& two_point_vec);
 };
 #endif

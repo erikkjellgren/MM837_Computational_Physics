@@ -1,13 +1,14 @@
 {
-	"L": 20,
-	"replications": 1,
-	"thermalization_sweeps": 0,
-	"simulation_sweeps": 10000,
+	"L": 10,
+	"replications": 40,
+	"thermalization_sweeps": 10000,
+	"simulation_sweeps": 1000000,
 	"sample_frequency": 1,
-	"sweep_method": 2,
+	"lattice_print_frequency": 1000000,
+	"sweep_method": 1,
 	"random_seed": 1,
 	"beta": 1.0,
 	"typewriter_freqency": 10,
-	"delta_range": 0.2,
+	"delta_range": 1.0,
 	"autocorrelation_cut": 1000
 }

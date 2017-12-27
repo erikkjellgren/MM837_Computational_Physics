@@ -16,7 +16,7 @@ using json = nlohmann::json;
 
 int main(){
 	int L, thermalization_sweeps, simulation_sweeps, sample_frequency,
-		sweep_method, typewriter_freqency, random_seed,
+		sweep_method, micro_sweeps, random_seed,
 		autocorrelation_cut, replications, lattice_frequency;
 	double beta, acceptance_ratio, delta_range;
 	
@@ -28,7 +28,7 @@ int main(){
 	simulation_sweeps = j["simulation_sweeps"];
 	sample_frequency = j["sample_frequency"];
 	sweep_method = j["sweep_method"];
-	typewriter_freqency = j["typewriter_freqency"];
+	micro_sweeps = j["micro_sweeps"];
 	random_seed = j["random_seed"];
 	beta = j["beta"];
 	autocorrelation_cut = j["autocorrelation_cut"];
@@ -46,7 +46,7 @@ int main(){
 		vector<double> energy_container(simulation_sweeps/sample_frequency, 0);
 		
 		// Initialize lattice and sweeper method
-		Lattice lattice_func(random_seed+run_ID, L, beta, sweep_method, typewriter_freqency, delta_range);
+		Lattice lattice_func(random_seed+run_ID, L, beta, sweep_method, micro_sweeps, delta_range);
 
 		for (int i=1; i<thermalization_sweeps+1; i++){
 			lattice_func.do_sweep();

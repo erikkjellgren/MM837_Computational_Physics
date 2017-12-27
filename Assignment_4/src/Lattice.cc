@@ -12,13 +12,13 @@
 using namespace std;
 
 Lattice::Lattice(const int& seed_in, const int& L_in, const double& beta_in, const int& sweeping_method_in, 
-				 const int& typewriter_frequency_in, const double& proposal_delta_in) : 
+				 const int& micro_sweeps_in, const double& proposal_delta_in) : 
 	rng_seed(seed_in), 
 	L(L_in),  
 	beta(beta_in), 
 	sweeping_method(sweeping_method_in), 
 	p_add_cluster(1.0 - exp(-1.0*beta_in)), 
-	typewriter_frequency(typewriter_frequency_in), 
+	micro_sweeps(micro_sweeps_in), 
 	uniform_random(uniform_real_distribution<double>(0,1)), 
 	uniform_angle_random(uniform_real_distribution<double>(-proposal_delta_in/2.0, proposal_delta_in/2.0)),
 	uniform_int_lattice(uniform_int_distribution<int>(0,L_in-1)),
@@ -28,7 +28,6 @@ Lattice::Lattice(const int& seed_in, const int& L_in, const double& beta_in, con
 		
 		number_accepted = 0;
 		number_purposes = 0;
-		typewriter_counter = 0;
 		
 		if (sweeping_method == 1){Sweep = &Lattice::Typewriter;}
 		else if (sweeping_method == 2){Sweep = &Lattice::wolff_cluster;}
@@ -90,15 +89,14 @@ void Lattice::Typewriter(){
 
 
 void Lattice::Microcanonical(){
-	typewriter_counter += 1;
-	if (typewriter_counter%(typewriter_frequency+1) == 0){Typewriter();}
-	else {
+	for (int k=0; k<micro_sweeps; k++){
 		for (int i=0; i<L; i++){
 			for (int j=0; j<L; j++){
 				overrelaxation(i, j);
 			}
 		}
 	}
+	Typewriter();
 }
 
 

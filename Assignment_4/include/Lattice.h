@@ -15,9 +15,9 @@ using namespace std;
 
 class Lattice{
 	private:
-		const int rng_seed, L, sweeping_method, typewriter_frequency;
+		const int rng_seed, L, sweeping_method, micro_sweeps;
 		const double beta, p_add_cluster;
-		long int typewriter_counter, number_accepted, number_purposes;
+		long int number_accepted, number_purposes;
 		typedef mt19937 random_generator;
 		random_generator gen;
 		uniform_real_distribution<double> uniform_angle_random;
@@ -30,7 +30,7 @@ class Lattice{
 		typedef void (Lattice::*fptr)();
 		fptr Sweep;
 	public:
-		Lattice(const int& seed_in, const int& L_in, const double& beta_in, const int& sweeping_method_in, const int& typewriter_frequency_in, const double& proposal_delta_in);
+		Lattice(const int& seed_in, const int& L_in, const double& beta_in, const int& sweeping_method_in, const int& micro_sweeps_in, const double& proposal_delta_in);
 		void do_sweep();
 		void Typewriter();
 		void wolff_cluster();

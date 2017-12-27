@@ -164,9 +164,6 @@ void Lattice::wolff_cluster(){
 	sigma_x1 = cos(lattice[i_start][j_start]);
 	sigma_y1 = sin(lattice[i_start][j_start]);
 	s1 = sigma_x1*r_x + sigma_y1*r_y;
-	sigma_prime_x = sigma_x1 - 2.0*s1*r_x;
-	sigma_prime_y = sigma_y1 - 2.0*s1*r_y;
-	lattice[i_start][j_start] = atan2(sigma_prime_y, sigma_prime_x);
 	lattice_check[i_start][j_start] = 1;
 
 	// Heavily based on cluster script from class
@@ -190,8 +187,8 @@ void Lattice::wolff_cluster(){
 		if(lattice_check[i][j_left] == 0){neighbors.push_back(make_pair(i,j_left));}
 		if(lattice_check[i][j_right] == 0){neighbors.push_back(make_pair(i,j_right));}
 		
-		sigma_x1 = cos(lattice[i_start][j_start]);
-		sigma_y1 = sin(lattice[i_start][j_start]);
+		sigma_x1 = cos(lattice[i][j]);
+		sigma_y1 = sin(lattice[i][j]);
 		s1 = sigma_x1*r_x + sigma_y1*r_y;
 		
 		for (int k=0; k<neighbors.size(); k++){
@@ -203,18 +200,28 @@ void Lattice::wolff_cluster(){
 			s2 = sigma_x2*r_x + sigma_y2*r_y;
 			
 			if (-2.0*beta*s1*s2 > 0){;}
-			else if (uniform_random(gen) < 1 - exp(-2.0*beta*s1*s2)){
-				sigma_prime_x = sigma_x2 - 2.0*s2*r_x;
-				sigma_prime_y = sigma_y2 - 2.0*s2*r_y;
-				lattice[k_i][k_j] = atan2(sigma_prime_y, sigma_prime_x);
+			if (uniform_random(gen) < 1 - exp(-2.0*beta*s1*s2)){
 				lattice_check[k_i][k_j] = 1;
 				cluster_buffer.push(make_pair(k_i,k_j));
 				number_accepted += 1;
 			}
 		}
 	}
+	
+	// change all the spins
+	for (int i=0; i<L; i++){
+		for (int j=0; j<L; j++){
+			if (lattice_check[i][j] == 1){
+				sigma_x1 = cos(lattice[i][j]);
+				sigma_y1 = sin(lattice[i][j]);
+				s1 = sigma_x1*r_x + sigma_y1*r_y;
+				sigma_prime_x = sigma_x1 - 2.0*s1*r_x;
+				sigma_prime_y = sigma_y1 - 2.0*s1*r_y;
+				lattice[i][j] = atan2(sigma_prime_y, sigma_prime_x);
+			}
+		}
+	}
 }
-
 
 double Lattice::return_energy(){
 		double Energy = 0.0;

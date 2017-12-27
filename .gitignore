@@ -24,3 +24,4 @@ hybrid_*
 # From running scripts
 *.dat
 *.out
+*.swp

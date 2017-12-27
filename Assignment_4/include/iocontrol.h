@@ -16,12 +16,19 @@ using json = nlohmann::json;
 class print_results{
 	private:
 		FILE* output_file;
+		FILE* int_autocorr_file;
+		FILE* autocorr_file;
 		FILE* energy_file;
-		const int run_ID;
+		FILE* lattice_file;
+		const int run_ID, L;
 	public:
-		print_results(const int& run_ID_in);
+		print_results(const int& run_ID_in, const int& L_in);
 		void close_files();
 		void write_input();
+		void write_integrated_autocorr(const vector<double>& autocorr);
+		void write_autocorr(const vector<double>& autocorr);
 		void write_energy(const vector<double>& energy);
+		void write_acceptance_ratio(const double& acceptance);
+		void write_lattice(const vector<vector<double>>& lattice);
 };
 #endif

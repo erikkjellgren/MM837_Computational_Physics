@@ -1,11 +1,13 @@
 {
-	"L": 10,
+	"L": 20,
 	"replications": 1,
-	"thermalization_sweeps": 1000000,
-	"simulation_sweeps": 100,
+	"thermalization_sweeps": 0,
+	"simulation_sweeps": 10000,
 	"sample_frequency": 1,
-	"sweep_method": 3,
+	"sweep_method": 2,
 	"random_seed": 1,
-	"initial_lattice": 1,
-	"beta": 10
+	"beta": 1.0,
+	"typewriter_freqency": 10,
+	"delta_range": 0.2,
+	"autocorrelation_cut": 1000
 }

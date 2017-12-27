@@ -41,13 +41,12 @@ int main(){
 		// Initialize iocontrol
 		print_results results(run_ID, L);
 		results.write_input();
-		random_seed += run_ID;
 		
 		// Make container for energies
 		vector<double> energy_container(simulation_sweeps/sample_frequency, 0);
 		
 		// Initialize lattice and sweeper method
-		Lattice lattice_func(random_seed, L, beta, sweep_method, typewriter_freqency, delta_range);
+		Lattice lattice_func(random_seed+run_ID, L, beta, sweep_method, typewriter_freqency, delta_range);
 
 		for (int i=1; i<thermalization_sweeps+1; i++){
 			lattice_func.do_sweep();

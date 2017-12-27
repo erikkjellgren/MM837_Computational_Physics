@@ -1,6 +1,6 @@
 {
 	"L": 10,
-	"replications": 40,
+	"replications": 10,
 	"thermalization_sweeps": 10000,
 	"simulation_sweeps": 1000000,
 	"sample_frequency": 1,

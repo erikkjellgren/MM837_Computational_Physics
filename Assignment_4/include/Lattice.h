@@ -15,7 +15,7 @@ using namespace std;
 
 class Lattice{
 	private:
-		const int rng_seed, L, sweeping_method, micro_sweeps;
+		const int rng_seed, L, sweeping_method, micro_sweeps, initial_lattice;
 		const double beta, p_add_cluster;
 		long int number_accepted, number_purposes;
 		typedef mt19937 random_generator;
@@ -24,13 +24,13 @@ class Lattice{
 		uniform_int_distribution<int> uniform_int_lattice;
 		uniform_real_distribution<double> uniform_random;
 		uniform_real_distribution<double> uniform_real_x;
-		uniform_int_distribution<int> get_sign;
+		uniform_real_distribution<double> uniform_initial;
 		vector<vector<double>> lattice;
 		vector<double> two_point_corr_vector;
 		typedef void (Lattice::*fptr)();
 		fptr Sweep;
 	public:
-		Lattice(const int& seed_in, const int& L_in, const double& beta_in, const int& sweeping_method_in, const int& micro_sweeps_in, const double& proposal_delta_in);
+		Lattice(const int& seed_in, const int& L_in, const double& beta_in, const int& sweeping_method_in, const int& micro_sweeps_in, const double& proposal_delta_in, const int& initial_lattice_in);
 		void do_sweep();
 		void Typewriter();
 		void wolff_cluster();

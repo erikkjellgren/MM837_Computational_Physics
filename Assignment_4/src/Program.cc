@@ -16,7 +16,7 @@ using json = nlohmann::json;
 
 int main(){
 	int L, thermalization_sweeps, simulation_sweeps, sample_frequency,
-		sweep_method, micro_sweeps, random_seed,
+		sweep_method, micro_sweeps, random_seed, initial_lattice,
 		autocorrelation_cut, replications, lattice_frequency;
 	double beta, acceptance_ratio, delta_range;
 	
@@ -35,6 +35,7 @@ int main(){
 	replications = j["replications"];
 	delta_range = j["delta_range"];
 	lattice_frequency = j["lattice_print_frequency"];
+	initial_lattice = j["initial_lattice"];
 	
 	#pragma omp parallel for schedule(dynamic)
 	for (int run_ID=0; run_ID<replications; run_ID++){
@@ -46,7 +47,7 @@ int main(){
 		vector<double> energy_container(simulation_sweeps/sample_frequency, 0);
 		
 		// Initialize lattice and sweeper method
-		Lattice lattice_func(random_seed+run_ID, L, beta, sweep_method, micro_sweeps, delta_range);
+		Lattice lattice_func(random_seed+run_ID, L, beta, sweep_method, micro_sweeps, delta_range, initial_lattice);
 
 		for (int i=1; i<thermalization_sweeps+1; i++){
 			lattice_func.do_sweep();

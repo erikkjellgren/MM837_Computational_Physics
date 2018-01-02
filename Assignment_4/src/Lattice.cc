@@ -12,17 +12,19 @@
 using namespace std;
 
 Lattice::Lattice(const int& seed_in, const int& L_in, const double& beta_in, const int& sweeping_method_in, 
-				 const int& micro_sweeps_in, const double& proposal_delta_in) : 
+				 const int& micro_sweeps_in, const double& proposal_delta_in, const int& initial_lattice_in) : 
 	rng_seed(seed_in), 
 	L(L_in),  
-	beta(beta_in), 
+	beta(beta_in),
+	initial_lattice(initial_lattice_in),
 	sweeping_method(sweeping_method_in), 
 	p_add_cluster(1.0 - exp(-1.0*beta_in)), 
 	micro_sweeps(micro_sweeps_in), 
 	uniform_random(uniform_real_distribution<double>(0,1)), 
 	uniform_angle_random(uniform_real_distribution<double>(-proposal_delta_in/2.0, proposal_delta_in/2.0)),
 	uniform_int_lattice(uniform_int_distribution<int>(0,L_in-1)),
-	uniform_real_x(uniform_real_distribution<double>(-1,1))
+	uniform_real_x(uniform_real_distribution<double>(-1,1)),
+	uniform_initial(uniform_real_distribution<double>(-M_PI,M_PI))
 	{
 		gen.seed(rng_seed);
 		
@@ -36,7 +38,8 @@ Lattice::Lattice(const int& seed_in, const int& L_in, const double& beta_in, con
 		for (int i=0; i<L; i++){
 			lattice.push_back(vector<double>());
 			for (int j=0; j<L; j++){
-				lattice[i].push_back(0.0);
+				if (initial_lattice == 1){lattice[i].push_back(uniform_initial(gen));}
+				else {lattice[i].push_back(0.0);}
 			}
 		}
 		
